@@ -1,36 +1,47 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Kopi Kita
 
-## Getting Started
+Kopi Kita is a coffee shop website built as the first guided project for Module 1: Setup Vibe Coding Tools. The project proves that the development workflow is ready: Codex edits the project files, Git records the changes, and GitHub stores the public repository.
 
-First, run the development server:
+## Project Overview
+
+Kopi Kita helps customers discover the coffee shop, browse products, and book a table before visiting. It also prepares an admin side so the shop owner can manage products and customer bookings from one place.
+
+## Main Features
+
+### Menu Page
+
+The menu page presents Kopi Kita products in a clear catalog format. Customers can browse coffee, non-coffee drinks, and food items with names, descriptions, categories, and prices.
+
+### Table Booking
+
+The booking feature lets customers reserve a table online. A booking flow should collect customer details, visit date, visit time, guest count, and booking notes so the team can prepare the table before the customer arrives.
+
+### CMS for Products and Bookings
+
+The CMS is planned for internal shop management. It should allow the admin team to:
+
+- Add, edit, and remove menu products.
+- Update product names, prices, categories, descriptions, and availability.
+- View incoming table bookings.
+- Manage booking status such as pending, confirmed, or cancelled.
+
+## Tech Stack
+
+- Next.js
+- TypeScript
+- Tailwind CSS
+- Git and GitHub
+- Codex CLI for AI-assisted development
+
+## Development
 
 ```bash
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open `http://localhost:3000` in the browser to view the project locally.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Module 1 Submission Notes
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+This repository is the public `kopi-kita` repo required for Task 1. This README describes the Kopi Kita project as a coffee shop website with a menu page, table booking, and a CMS for managing products and bookings, created through a Codex-assisted session instead of the GitHub web editor.
