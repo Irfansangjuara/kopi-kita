@@ -2,15 +2,7 @@
 
 A full-stack coffee shop website with a public menu, table booking, and an admin CMS — built with Next.js and PostgreSQL.
 
-**Live Demo:** [https://kopi-kita.vercel.app](https://kopi-kita.vercel.app)
-
----
-
-## Screenshots
-
-*Screenshot of the public menu page will go here.*
-
-*Screenshot of the admin CMS dashboard will go here.*
+**Live Demo:** [https://kopikita.copilotmarketing.id](https://kopikita.copilotmarketing.id)
 
 ---
 
