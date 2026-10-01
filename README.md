@@ -1,98 +1,66 @@
-# Kopi Kita — Coffee Shop Website
+# Kopi Kita
 
-A full-stack coffee shop web application built as the guided project for the **AI Class Jogja** bootcamp (Modules 1–5).
+A full-stack coffee shop website with a public menu, table booking, and an admin CMS — built with Next.js and PostgreSQL.
 
-**Live demo:** [https://kopi-kita.vercel.app](https://kopi-kita.vercel.app) *(deploy to update this link)*
-
----
-
-## Features
-
-- **Public menu** — product catalog with category filter (Coffee / Non-Coffee / Pastry), real database data, loading skeletons, and an error state with "Try Again"
-- **Table booking form** — full validation (past dates, WhatsApp digits, party size 1–8), submits to the server and shows a confirmation card with booking ID
-- **Admin CMS** — login-protected dashboard, product CRUD (add / edit / delete / toggle available), booking management with status workflow (pending → confirmed → done / cancelled)
-- **Persistent sessions** — session IDs stored in Postgres so admin stays logged in across serverless restarts
-- **Testimonials** — customer review cards on the landing page
+**Live Demo:** [https://kopi-kita.vercel.app](https://kopi-kita.vercel.app)
 
 ---
 
 ## Screenshots
 
-| Landing page | Menu page |
-|---|---|
-| *(add screenshot)* | *(add screenshot)* |
+*Screenshot of the public menu page will go here.*
 
-| CMS — Products | CMS — Bookings |
-|---|---|
-| *(add screenshot)* | *(add screenshot)* |
+*Screenshot of the admin CMS dashboard will go here.*
 
 ---
 
-## Tech stack
+## Features
 
-| Layer | Technology |
-|---|---|
-| Framework | Next.js 16 (App Router, TypeScript) |
-| Styling | Tailwind CSS 4 |
-| Backend | Express mounted inside Next.js via catch-all API route |
-| Database | PostgreSQL — Docker (local) · Neon (production) |
-| Auth | Session cookies, bcrypt password hashing, DB-backed sessions |
-| Deployment | Vercel (CI/CD on every push to `main`) |
+- **Public menu page** with real-time product data loaded from the database
+- **Category filter** to browse by Coffee / Non-Coffee / Pastry
+- **Table booking form** with input validation that saves reservations to the database
+- **Admin CMS** to manage products (add / edit / delete / toggle availability) and bookings (filter and update status)
+- **Secure admin login** with session-based authentication
 
 ---
 
-## Running locally
+## Tech Stack
 
-### Prerequisites
+- **Next.js 16** (App Router)
+- **TypeScript**
+- **Tailwind CSS**
+- **Express** (mounted inside Next.js)
+- **PostgreSQL** (Docker for local development, Neon for production)
+- **Vercel** (deployment)
 
-- Node.js v22+
-- Docker Desktop (for the local Postgres container)
+---
 
-### Steps
+## Running Locally
 
 ```bash
-# 1. Clone the repo
-git clone https://github.com/Irfansangjuara/kopi-kita.git
-cd kopi-kita
+# 1. Start the database
+docker compose up -d
 
 # 2. Install dependencies
 npm install
 
-# 3. Configure environment
+# 3. Copy env template and fill in values
 cp .env.example .env.local
-# Edit .env.local — set DATABASE_URL to the Docker connection string
 
-# 4. Start Postgres
-docker compose up -d
+# 4. Seed the database
+npm run db:reset
 
-# 5. Load schema + seed data
-docker compose exec db psql -U kopikita -d kopikita \
-  -f /dev/stdin < src/server/db/schema.sql
-docker compose exec db psql -U kopikita -d kopikita \
-  -f /dev/stdin < src/server/db/seed.sql
-
-# 6. Start the development server (one command — no separate API server needed)
+# 5. Start the development server
 npm run dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000).
-
-**Admin:** [http://localhost:3000/admin/login](http://localhost:3000/admin/login)  
-Email: `admin@kopikita.id` · Password: `kopikita-admin`
-
-### Resetting the database
-
-```bash
-npm run db:reset
-```
+Then open [http://localhost:3000](http://localhost:3000).
 
 ---
 
-## Deploying to Vercel
+## Admin Credentials
 
-1. Create a free Postgres database on [neon.tech](https://neon.tech) and run the schema + seed against it.
-2. Import this repo on [vercel.com](https://vercel.com).
-3. Add environment variables in Vercel settings:
-   - `DATABASE_URL` — Neon connection string
-   - `NEXT_PUBLIC_API_URL` — leave empty (same-origin API)
-4. Deploy. Every push to `main` triggers an automatic redeploy.
+Access the admin dashboard at [http://localhost:3000/admin/login](http://localhost:3000/admin/login):
+
+- **Email:** `admin@kopikita.id`
+- **Password:** `kopikita-admin`
