@@ -43,24 +43,6 @@ export default function Home() {
           className="landing-hero__background"
         />
         <div className="landing-hero__veil" />
-        <Image
-          src="/template/landing/hero-left.png"
-          alt=""
-          width={468}
-          height={703}
-          loading="eager"
-          aria-hidden="true"
-          className="landing-hero__hand landing-hero__hand--left"
-        />
-        <Image
-          src="/template/landing/hero-right.png"
-          alt=""
-          width={468}
-          height={703}
-          loading="eager"
-          aria-hidden="true"
-          className="landing-hero__hand landing-hero__hand--right"
-        />
 
         <div className="landing-hero__content">
           <p className="eyebrow">Kedai kopi di Yogyakarta</p>
