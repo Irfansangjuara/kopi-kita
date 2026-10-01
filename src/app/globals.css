@@ -349,3 +349,43 @@ select:focus {
   line-height: 1.8;
   color: var(--color-dark-brown);
 }
+
+/* ── Responsive polish ──────────────────────────────────────────────
+   Fluid typography + mobile fixes for consistent look on phone & desktop. */
+
+/* Scale up the quote on larger screens for a stronger editorial feel */
+@media (min-width: 768px) {
+  .quote-text {
+    font-size: 1.75rem;
+  }
+}
+
+/* Phone: tone down oversized display type so headings never overflow */
+@media (max-width: 640px) {
+  .section-title {
+    font-size: 2rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .page-title-overlay {
+    min-height: 40vh;
+  }
+
+  .page-title-overlay h2 {
+    font-size: 2.25rem;
+  }
+
+  .quote-text {
+    font-size: 1.125rem;
+    line-height: 1.7;
+  }
+}
+
+/* iOS Safari mishandles background-attachment: fixed on touch devices
+   (background jumps/zooms on scroll). Fall back to scroll on small screens. */
+@media (max-width: 768px) {
+  .bg-fixed,
+  .page-title-overlay {
+    background-attachment: scroll;
+  }
+}
