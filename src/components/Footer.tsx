@@ -1,62 +1,64 @@
 import Link from 'next/link';
 
 export default function Footer() {
+  const menuItems = [
+    { name: 'Homepage', href: '/' },
+    { name: 'Story', href: '/#story' },
+    { name: 'Menu', href: '/menu' },
+    { name: 'Booking', href: '/booking' },
+  ];
+
   return (
-    <footer className="bg-dark-brown text-cream py-12">
-      <div className="container mx-auto px-4">
-        <div className="grid md:grid-cols-3 gap-8">
-          {/* Brand */}
+    <footer className="footer-bg text-cream py-16">
+      <div className="container mx-auto px-4 relative z-10">
+        <div className="grid md:grid-cols-3 gap-12 mb-12">
+          {/* Links */}
           <div>
-            <h3 className="text-2xl font-bold mb-4">Kopi Kita</h3>
-            <p className="text-cream/80 leading-relaxed">
-              Kopi Kita hadir dari ide sederhana bahwa setiap orang berhak menikmati kopi
-              berkualitas. Baik Anda menyukai kopi ringan dan manis, atau preferensi strong
-              tanpa gula, kami siap memenuhi selera Anda.
-            </p>
+            <h5 className="text-lg font-bold mb-6">Links</h5>
+            <ul className="space-y-3">
+              {menuItems.map((item) => (
+                <li key={item.name}>
+                  <Link
+                    href={item.href}
+                    className="text-cream/80 hover:text-accent transition-colors"
+                  >
+                    {item.name}
+                  </Link>
+                </li>
+              ))}
+            </ul>
           </div>
 
-          {/* Quick Links */}
+          {/* Contacts */}
           <div>
-            <h4 className="text-lg font-semibold mb-4">Quick Links</h4>
-            <nav className="flex flex-col gap-2">
-              <Link href="/" className="text-cream/80 hover:text-accent transition-colors">
-                Home
-              </Link>
-              <Link href="/menu" className="text-cream/80 hover:text-accent transition-colors">
-                Menu
-              </Link>
-              <Link href="/booking" className="text-cream/80 hover:text-accent transition-colors">
-                Booking
-              </Link>
-            </nav>
+            <h5 className="text-lg font-bold mb-6">Contacts</h5>
+            <p className="text-cream/80">hello@kopikita.id</p>
+            <p className="text-cream/80 mt-2">+62 812 3456 7890</p>
           </div>
 
-          {/* Contact */}
+          {/* Socials */}
           <div>
-            <h4 className="text-lg font-semibold mb-4">Contact Us</h4>
-            <div className="space-y-3 text-cream/80">
-              <div className="flex items-start gap-3">
-                <svg className="w-5 h-5 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 12 15.372">
-                  <path d="M5.383,15.062C.843,8.738,0,8.089,0,5.765A5.886,5.886,0,0,1,6,0a5.886,5.886,0,0,1,6,5.765c0,2.324-.843,2.973-5.383,9.3A.768.768,0,0,1,5.383,15.062ZM6,8.167a2.452,2.452,0,0,0,2.5-2.4A2.452,2.452,0,0,0,6,3.363a2.452,2.452,0,0,0-2.5,2.4A2.452,2.452,0,0,0,6,8.167Z" />
-                </svg>
-                <span>Jl. Kaliurang Km 5, Yogyakarta</span>
-              </div>
-              <div className="flex items-center gap-3">
-                <svg className="w-5 h-5 flex-shrink-0" fill="currentColor" viewBox="0 0 32 32">
-                  <path d="M16 0c-8.837 0-16 7.163-16 16s7.163 16 16 16 16-7.163 16-16-7.163-16-16-16zM20.586 23.414l-6.586-6.586v-8.828h4v7.172l5.414 5.414-2.829 2.829z" />
-                </svg>
-                <span>08:00 - 22:00 (Setiap Hari)</span>
-              </div>
-              <div className="flex items-center gap-3">
-                <span className="text-lg">📱</span>
-                <span>+62 812 3456 7890</span>
-              </div>
-            </div>
+            <h5 className="text-lg font-bold mb-6">Socials</h5>
+            <a
+              href="https://instagram.com"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 text-cream/80 hover:text-accent transition-colors"
+            >
+              <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 28">
+                <path d="M16 14c0-2.203-1.797-4-4-4s-4 1.797-4 4 1.797 4 4 4 4-1.797 4-4zM18.156 14c0 3.406-2.75 6.156-6.156 6.156s-6.156-2.75-6.156-6.156 2.75-6.156 6.156-6.156 6.156 2.75 6.156 6.156zM19.844 7.594c0 0.797-0.641 1.437-1.437 1.437s-1.437-0.641-1.437-1.437 0.641-1.437 1.437-1.437 1.437 0.641 1.437 1.437zM12 4.156c-1.75 0-5.5-0.141-7.078 0.484-0.547 0.219-0.953 0.484-1.375 0.906s-0.688 0.828-0.906 1.375c-0.625 1.578-0.484 5.328-0.484 7.078s-0.141 5.5 0.484 7.078c0.219 0.547 0.484 0.953 0.906 1.375s0.828 0.688 1.375 0.906c1.578 0.625 5.328 0.484 7.078 0.484s5.5 0.141 7.078-0.484c0.547-0.219 0.953-0.484 1.375-0.906s0.688-0.828 0.906-1.375c0.625-1.578 0.484-5.328 0.484-7.078s0.141-5.5-0.484-7.078c-0.219-0.547-0.484-0.953-0.906-1.375s-0.828-0.688-1.375-0.906c-1.578-0.625-5.328-0.484-7.078-0.484zM24 14c0 1.656 0.016 3.297-0.078 4.953-0.094 1.922-0.531 3.625-1.937 5.031s-3.109 1.844-5.031 1.937c-1.656 0.094-3.297 0.078-4.953 0.078s-3.297 0.016-4.953-0.078c-1.922-0.094-3.625-0.531-5.031-1.937s-1.844-3.109-1.937-5.031c-0.094-1.656-0.078-3.297-0.078-4.953s-0.016-3.297 0.078-4.953c0.094-1.922 0.531-3.625 1.937-5.031s3.109-1.844 5.031-1.937c1.656-0.094 3.297-0.078 4.953-0.078s3.297-0.016 4.953 0.078c1.922 0.094 3.625 0.531 5.031 1.937s1.844 3.109 1.937 5.031c0.094 1.656 0.078 3.297 0.078 4.953z" />
+              </svg>
+              <span>@kopikita.id</span>
+            </a>
           </div>
         </div>
 
-        <div className="border-t border-cream/20 mt-8 pt-8 text-center text-cream/60">
-          <p>© {new Date().getFullYear()} Kopi Kita. All rights reserved.</p>
+        {/* Logo & Copyright */}
+        <div className="text-center pt-8 border-t border-cream/20">
+          <h3 className="text-3xl font-bold mb-4">Kopi Kita</h3>
+          <p className="text-cream/60 text-sm">
+            © {new Date().getFullYear()} Kopi Kita. All rights reserved.
+          </p>
         </div>
       </div>
     </footer>
