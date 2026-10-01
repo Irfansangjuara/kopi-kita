@@ -1,0 +1,22 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres:16
+    container_name: kopikita-db
+    environment:
+      POSTGRES_DB: kopikita
+      POSTGRES_USER: kopikita
+      POSTGRES_PASSWORD: kopikita123
+    ports:
+      - "5432:5432"
+    volumes:
+      - kopikita-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U kopikita -d kopikita"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  kopikita-data:
