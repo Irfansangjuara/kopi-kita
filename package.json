@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "build": "next build --webpack",
     "start": "next start",
     "lint": "next lint",
     "db:reset": "docker compose exec db psql -U kopikita -d kopikita -f /dev/stdin < src/server/db/schema.sql && docker compose exec db psql -U kopikita -d kopikita -f /dev/stdin < src/server/db/seed.sql"
