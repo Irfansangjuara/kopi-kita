@@ -12,27 +12,21 @@ export const metadata: Metadata = {
 export default function MenuPage() {
   return (
     <main className="bg-cream text-dark-brown">
-      <section className="relative flex min-h-[320px] items-center justify-center overflow-hidden md:min-h-[400px]">
+      <section className="landing-hero" aria-label="Menu Kopi Kita">
         <Image
-          src="/template/menu/menu-hero.jpg"
-          alt="Dua minuman Kopi Kita yang sedang dinikmati bersama"
+          src="/template/landing/atmosphere.jpg"
+          alt="Suasana kedai Kopi Kita"
           fill
-          preload
+          loading="eager"
           sizes="100vw"
-          className="object-cover object-center"
+          className="landing-hero__background"
         />
-        <div className="absolute inset-0 bg-gradient-to-b from-white/35 via-[#4A2C2A]/35 to-[#4A2C2A]/75" />
-        <div className="relative z-10 max-w-2xl px-6 text-center text-[#FAF3E0]">
-          <p className="mb-2 text-xs font-bold uppercase tracking-[0.3em] sm:text-sm">
-            Racikan Pilihan
-          </p>
-          <h1 className="text-4xl font-bold tracking-[0.12em] drop-shadow-md sm:text-5xl">
-            Menu
-          </h1>
-          <p className="mt-4 text-sm leading-relaxed drop-shadow sm:text-base">
-            Nikmati kopi pilihan dan pastry hangat yang diracik untuk setiap
-            momen.
-          </p>
+        <div className="landing-hero__veil" />
+
+        <div className="landing-hero__content">
+          <p className="eyebrow">Racikan Pilihan</p>
+          <h1>MENU</h1>
+          <p className="landing-hero__tagline">Kopi, non-kopi, dan pastry untuk setiap momen.</p>
         </div>
       </section>
 
