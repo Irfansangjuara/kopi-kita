@@ -1,406 +1,87 @@
-'use client';
+import type { Metadata } from 'next';
+import Image from 'next/image';
+import BookingForm from '@/components/booking-form';
 
-import { useState, FormEvent } from 'react';
-
-interface FormData {
-  name: string;
-  email: string;
-  phone: string;
-  whatsapp: string;
-  date: string;
-  time: string;
-  guests: string;
-  message: string;
-}
+export const metadata: Metadata = {
+  title: 'Book a Table',
+  description:
+    'Reserve a table at Kopi Kita for coffee, conversation, and an easygoing break in Yogyakarta.',
+};
 
 export default function BookingPage() {
-  const [formData, setFormData] = useState<FormData>({
-    name: '',
-    email: '',
-    phone: '',
-    whatsapp: '',
-    date: '',
-    time: '',
-    guests: '2',
-    message: '',
-  });
-
-  const [errors, setErrors] = useState<Partial<FormData>>({});
-  const [isSubmitted, setIsSubmitted] = useState(false);
-
-  const validateForm = (): boolean => {
-    const newErrors: Partial<FormData> = {};
-
-    // Name validation
-    if (!formData.name.trim()) {
-      newErrors.name = 'Nama wajib diisi';
-    }
-
-    // Email validation
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(formData.email)) {
-      newErrors.email = 'Email tidak valid';
-    }
-
-    // Phone validation (numbers only)
-    const phoneRegex = /^[0-9+]+$/;
-    if (!phoneRegex.test(formData.phone)) {
-      newErrors.phone = 'Nomor telepon hanya boleh berisi angka';
-    }
-
-    // WhatsApp validation (numbers only, no letters)
-    if (!phoneRegex.test(formData.whatsapp)) {
-      newErrors.whatsapp = 'Nomor WhatsApp hanya boleh berisi angka';
-    }
-
-    // Date validation (not in the past)
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    const selectedDate = new Date(formData.date);
-    if (!formData.date || selectedDate < today) {
-      newErrors.date = 'Tanggal tidak boleh hari yang sudah lewat';
-    }
-
-    // Time validation
-    if (!formData.time) {
-      newErrors.time = 'Waktu wajib dipilih';
-    }
-
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
-
-  const handleSubmit = (e: FormEvent) => {
-    e.preventDefault();
-    
-    if (validateForm()) {
-      setIsSubmitted(true);
-    }
-  };
-
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
-    // Clear error when user types
-    if (errors[name as keyof FormData]) {
-      setErrors((prev) => ({ ...prev, [name]: undefined }));
-    }
-  };
-
-  if (isSubmitted) {
-    return (
-      <>
-        {/* Page Title */}
-        <section
-          className="page-title-overlay"
-          style={{
-            backgroundImage:
-              'url(https://images.unsplash.com/photo-1554118811-1e0d58224f24?w=1920&h=600&fit=crop)',
-          }}
-        >
-          <div className="container mx-auto px-4 text-center">
-            <h2>
-              <span>Booking</span>
-            </h2>
-          </div>
-        </section>
-
-        {/* Confirmation Card */}
-        <section className="py-24 bg-cream">
-          <div className="container mx-auto px-4">
-            <div className="max-w-2xl mx-auto bg-white rounded-xl shadow-xl p-8 text-center">
-              <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
-                <svg className="w-10 h-10 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                </svg>
-              </div>
-              <h2 className="text-3xl font-bold text-dark-brown mb-4">Booking Berhasil!</h2>
-              <p className="text-dark-brown/70 mb-8">
-                Terima kasih, {formData.name}! Booking Anda telah kami terima.
-                Kami akan menghubungi Anda melalui WhatsApp untuk konfirmasi.
-              </p>
-              
-              {/* Booking Details */}
-              <div className="bg-cream rounded-lg p-6 text-left mb-8">
-                <h3 className="font-bold text-dark-brown mb-4 text-center">Detail Booking</h3>
-                <div className="grid grid-cols-2 gap-4 text-sm">
-                  <div>
-                    <p className="text-dark-brown/60">Nama</p>
-                    <p className="font-medium text-dark-brown">{formData.name}</p>
-                  </div>
-                  <div>
-                    <p className="text-dark-brown/60">Email</p>
-                    <p className="font-medium text-dark-brown">{formData.email}</p>
-                  </div>
-                  <div>
-                    <p className="text-dark-brown/60">Tanggal</p>
-                    <p className="font-medium text-dark-brown">
-                      {new Date(formData.date).toLocaleDateString('id-ID', {
-                        weekday: 'long',
-                        year: 'numeric',
-                        month: 'long',
-                        day: 'numeric',
-                      })}
-                    </p>
-                  </div>
-                  <div>
-                    <p className="text-dark-brown/60">Waktu</p>
-                    <p className="font-medium text-dark-brown">{formData.time}</p>
-                  </div>
-                  <div>
-                    <p className="text-dark-brown/60">Jumlah Tamu</p>
-                    <p className="font-medium text-dark-brown">{formData.guests} orang</p>
-                  </div>
-                  <div>
-                    <p className="text-dark-brown/60">WhatsApp</p>
-                    <p className="font-medium text-dark-brown">{formData.whatsapp}</p>
-                  </div>
-                </div>
-              </div>
-              
-              <button
-                onClick={() => {
-                  setIsSubmitted(false);
-                  setFormData({
-                    name: '',
-                    email: '',
-                    phone: '',
-                    whatsapp: '',
-                    date: '',
-                    time: '',
-                    guests: '2',
-                    message: '',
-                  });
-                }}
-                className="btn-primary"
-              >
-                Booking Lagi
-              </button>
-            </div>
-          </div>
-        </section>
-      </>
-    );
-  }
-
   return (
     <>
-      {/* Page Title */}
       <section
-        className="page-title-overlay"
+        aria-labelledby="booking-page-title"
+        className="relative flex min-h-[18rem] items-center overflow-hidden bg-cover bg-center sm:min-h-[25rem]"
         style={{
-          backgroundImage:
-            'url(https://images.unsplash.com/photo-1554118811-1e0d58224f24?w=1920&h=600&fit=crop)',
+          backgroundImage: "url('/template/booking/contact-bg.jpg')",
         }}
       >
-        <div className="container mx-auto px-4 text-center">
-          <h2>
-            <span>Booking</span>
-          </h2>
+        <div className="absolute inset-0 bg-[#4A2C2A]/30" />
+        <div className="relative mx-auto w-full max-w-7xl px-5 py-20 sm:px-8 lg:px-12">
+          <p className="mb-3 text-xs font-bold tracking-[0.3em] text-[#FAF3E0]/85 uppercase">
+            Kopi Kita reservations
+          </p>
+          <h1
+            id="booking-page-title"
+            className="max-w-3xl text-5xl font-bold tracking-tight text-[#FAF3E0] sm:text-7xl"
+          >
+            Booking
+          </h1>
+          <div className="mt-5 h-1 w-20 bg-[#D9822B]" />
         </div>
       </section>
 
-      {/* Booking Form Section */}
-      <section className="py-24 bg-cream">
-        <div className="container mx-auto px-4">
-          <div className="max-w-3xl mx-auto">
-            <h2 className="section-title text-dark-brown text-center">RESERVASI TEMPAT</h2>
-            <p className="text-center text-dark-brown/70 mb-12">
-              Pesan tempat Anda untuk meeting, gathering, atau sekadar nongkrong bersama teman-teman.
-            </p>
+      <section className="bg-[#FAF3E0] px-5 py-16 sm:px-8 sm:py-24 lg:px-12">
+        <div className="mx-auto grid max-w-7xl items-start gap-12 lg:grid-cols-[minmax(0,0.82fr)_minmax(32rem,1.18fr)] lg:gap-16">
+          <aside className="lg:sticky lg:top-28">
+            <div className="relative overflow-hidden rounded-sm bg-[#fffdf8] shadow-[0_20px_60px_rgba(74,44,42,0.1)]">
+              <div className="absolute inset-x-0 top-0 h-2 bg-[#D9822B]" />
+              <Image
+                src="/template/booking/contact-decoration.jpg"
+                alt="Origami birds from the supplied coffee shop design"
+                width={454}
+                height={366}
+                sizes="(max-width: 1023px) calc(100vw - 2.5rem), 38vw"
+                className="h-auto w-full"
+                priority
+              />
+            </div>
 
-            <form onSubmit={handleSubmit} className="bg-white rounded-xl shadow-xl p-8">
-              <div className="grid md:grid-cols-2 gap-6">
-                {/* Name */}
-                <div>
-                  <label htmlFor="name" className="block text-dark-brown font-medium mb-2">
-                    Nama Lengkap *
-                  </label>
-                  <input
-                    type="text"
-                    id="name"
-                    name="name"
-                    value={formData.name}
-                    onChange={handleChange}
-                    className={`w-full px-4 py-3 rounded-lg border ${
-                      errors.name ? 'border-red-500' : 'border-gray-300'
-                    } focus:border-accent transition-colors`}
-                    placeholder="Masukkan nama lengkap"
-                  />
-                  {errors.name && (
-                    <p className="text-red-500 text-sm mt-1">{errors.name}</p>
-                  )}
+            <div className="mt-8">
+              <p className="mb-2 text-xs font-bold tracking-[0.24em] text-[#D9822B] uppercase">
+                Come as you are
+              </p>
+              <h2 className="text-3xl font-bold tracking-tight text-[#4A2C2A] sm:text-4xl">
+                Coffee tastes better together.
+              </h2>
+              <p className="mt-4 max-w-xl leading-8 text-[#4A2C2A]/72">
+                Pick a date, choose an hourly time slot, and we will have your table ready for a calm catch-up at Kopi Kita.
+              </p>
+
+              <dl className="mt-7 grid gap-3 sm:grid-cols-2 lg:grid-cols-1 xl:grid-cols-2">
+                <div className="border-l-2 border-[#D9822B] bg-[#fffdf8] px-4 py-3">
+                  <dt className="text-xs font-bold tracking-[0.15em] text-[#4A2C2A]/55 uppercase">
+                    Location
+                  </dt>
+                  <dd className="mt-1 text-sm font-semibold text-[#4A2C2A]">
+                    Jl. Kaliurang Km 5, Yogyakarta
+                  </dd>
                 </div>
-
-                {/* Email */}
-                <div>
-                  <label htmlFor="email" className="block text-dark-brown font-medium mb-2">
-                    Email *
-                  </label>
-                  <input
-                    type="email"
-                    id="email"
-                    name="email"
-                    value={formData.email}
-                    onChange={handleChange}
-                    className={`w-full px-4 py-3 rounded-lg border ${
-                      errors.email ? 'border-red-500' : 'border-gray-300'
-                    } focus:border-accent transition-colors`}
-                    placeholder="email@example.com"
-                  />
-                  {errors.email && (
-                    <p className="text-red-500 text-sm mt-1">{errors.email}</p>
-                  )}
+                <div className="border-l-2 border-[#D9822B] bg-[#fffdf8] px-4 py-3">
+                  <dt className="text-xs font-bold tracking-[0.15em] text-[#4A2C2A]/55 uppercase">
+                    Booking hours
+                  </dt>
+                  <dd className="mt-1 text-sm font-semibold text-[#4A2C2A]">
+                    Daily, 10:00–21:00
+                  </dd>
                 </div>
+              </dl>
+            </div>
+          </aside>
 
-                {/* Phone */}
-                <div>
-                  <label htmlFor="phone" className="block text-dark-brown font-medium mb-2">
-                    Nomor Telepon *
-                  </label>
-                  <input
-                    type="tel"
-                    id="phone"
-                    name="phone"
-                    value={formData.phone}
-                    onChange={handleChange}
-                    className={`w-full px-4 py-3 rounded-lg border ${
-                      errors.phone ? 'border-red-500' : 'border-gray-300'
-                    } focus:border-accent transition-colors`}
-                    placeholder="08xxxxxxxxxx"
-                  />
-                  {errors.phone && (
-                    <p className="text-red-500 text-sm mt-1">{errors.phone}</p>
-                  )}
-                </div>
-
-                {/* WhatsApp */}
-                <div>
-                  <label htmlFor="whatsapp" className="block text-dark-brown font-medium mb-2">
-                    Nomor WhatsApp *
-                  </label>
-                  <input
-                    type="tel"
-                    id="whatsapp"
-                    name="whatsapp"
-                    value={formData.whatsapp}
-                    onChange={handleChange}
-                    className={`w-full px-4 py-3 rounded-lg border ${
-                      errors.whatsapp ? 'border-red-500' : 'border-gray-300'
-                    } focus:border-accent transition-colors`}
-                    placeholder="08xxxxxxxxxx"
-                  />
-                  {errors.whatsapp && (
-                    <p className="text-red-500 text-sm mt-1">{errors.whatsapp}</p>
-                  )}
-                </div>
-
-                {/* Date */}
-                <div>
-                  <label htmlFor="date" className="block text-dark-brown font-medium mb-2">
-                    Tanggal *
-                  </label>
-                  <input
-                    type="date"
-                    id="date"
-                    name="date"
-                    value={formData.date}
-                    onChange={handleChange}
-                    min={new Date().toISOString().split('T')[0]}
-                    className={`w-full px-4 py-3 rounded-lg border ${
-                      errors.date ? 'border-red-500' : 'border-gray-300'
-                    } focus:border-accent transition-colors`}
-                  />
-                  {errors.date && (
-                    <p className="text-red-500 text-sm mt-1">{errors.date}</p>
-                  )}
-                </div>
-
-                {/* Time */}
-                <div>
-                  <label htmlFor="time" className="block text-dark-brown font-medium mb-2">
-                    Waktu *
-                  </label>
-                  <select
-                    id="time"
-                    name="time"
-                    value={formData.time}
-                    onChange={handleChange}
-                    className={`w-full px-4 py-3 rounded-lg border ${
-                      errors.time ? 'border-red-500' : 'border-gray-300'
-                    } focus:border-accent transition-colors`}
-                  >
-                    <option value="">Pilih waktu</option>
-                    <option value="08:00">08:00</option>
-                    <option value="09:00">09:00</option>
-                    <option value="10:00">10:00</option>
-                    <option value="11:00">11:00</option>
-                    <option value="12:00">12:00</option>
-                    <option value="13:00">13:00</option>
-                    <option value="14:00">14:00</option>
-                    <option value="15:00">15:00</option>
-                    <option value="16:00">16:00</option>
-                    <option value="17:00">17:00</option>
-                    <option value="18:00">18:00</option>
-                    <option value="19:00">19:00</option>
-                    <option value="20:00">20:00</option>
-                    <option value="21:00">21:00</option>
-                  </select>
-                  {errors.time && (
-                    <p className="text-red-500 text-sm mt-1">{errors.time}</p>
-                  )}
-                </div>
-
-                {/* Guests */}
-                <div className="md:col-span-2">
-                  <label htmlFor="guests" className="block text-dark-brown font-medium mb-2">
-                    Jumlah Tamu *
-                  </label>
-                  <select
-                    id="guests"
-                    name="guests"
-                    value={formData.guests}
-                    onChange={handleChange}
-                    className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-accent transition-colors"
-                  >
-                    <option value="1">1 orang</option>
-                    <option value="2">2 orang</option>
-                    <option value="3">3 orang</option>
-                    <option value="4">4 orang</option>
-                    <option value="5">5 orang</option>
-                    <option value="6">6 orang</option>
-                    <option value="7">7 orang</option>
-                    <option value="8">8 orang</option>
-                    <option value="10">10 orang</option>
-                    <option value="15">15+ orang</option>
-                  </select>
-                </div>
-
-                {/* Message */}
-                <div className="md:col-span-2">
-                  <label htmlFor="message" className="block text-dark-brown font-medium mb-2">
-                    Pesan Tambahan
-                  </label>
-                  <textarea
-                    id="message"
-                    name="message"
-                    value={formData.message}
-                    onChange={handleChange}
-                    rows={4}
-                    className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-accent transition-colors resize-none"
-                    placeholder="Ada permintaan khusus? Tulis di sini..."
-                  />
-                </div>
-              </div>
-
-              {/* Submit Button */}
-              <div className="mt-8 text-center">
-                <button type="submit" className="btn-primary text-lg px-8 py-4">
-                  Kirim Booking
-                </button>
-              </div>
-            </form>
-          </div>
+          <BookingForm />
         </div>
       </section>
     </>

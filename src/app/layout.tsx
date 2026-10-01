@@ -1,42 +1,15 @@
 import type { Metadata } from 'next';
-import { Geist, Geist_Mono } from 'next/font/google';
 import './globals.css';
-import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
-
-const geistSans = Geist({
-  variable: '--font-geist-sans',
-  subsets: ['latin'],
-});
-
-const geistMono = Geist_Mono({
-  variable: '--font-geist-mono',
-  subsets: ['latin'],
-});
+import Navbar from '@/components/Navbar';
 
 export const metadata: Metadata = {
   title: {
-    default: 'Kopi Kita - Coffee for Everyone',
+    default: 'Kopi Kita | Kopi Hangat, Ruang yang Akrab',
     template: '%s | Kopi Kita',
   },
-  description:
-    'Kopi Kita hadir dari ide sederhana bahwa setiap orang berhak menikmati kopi berkualitas. Tidak masalah jika Anda menyukai kopi ringan dan manis, atau preferensi strong tanpa gula, kami siap memenuhi selera Anda.',
-  keywords: ['kopi', 'coffee', 'cafe', 'yogyakarta', 'kopi kita', 'coffee shop', 'booking', 'menu'],
-  authors: [{ name: 'Kopi Kita' }],
-  openGraph: {
-    title: 'Kopi Kita - Coffee for Everyone',
-    description:
-      'Nikmati kopi berkualitas untuk semua selera. Kunjungi menu kami dan pesan tempat Anda di Kopi Kita.',
-    type: 'website',
-    locale: 'id_ID',
-    siteName: 'Kopi Kita',
-  },
-  twitter: {
-    card: 'summary_large_image',
-    title: 'Kopi Kita - Coffee for Everyone',
-    description:
-      'Nikmati kopi berkualitas untuk semua selera. Kunjungi menu kami dan pesan tempat Anda di Kopi Kita.',
-  },
+  description: 'Kopi Kita adalah kedai kopi hangat di Yogyakarta untuk menikmati racikan favorit, berbincang, bekerja, dan mengambil jeda.',
+  keywords: ['Kopi Kita', 'kedai kopi Yogyakarta', 'coffee shop', 'booking meja', 'menu kopi'],
 };
 
 export default function RootLayout({
@@ -45,12 +18,10 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="id" className="scroll-smooth">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
+    <html lang="id">
+      <body>
         <Navbar />
-        <main className="pt-16">{children}</main>
+        <main className="site-main">{children}</main>
         <Footer />
       </body>
     </html>

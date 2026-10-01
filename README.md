@@ -1,47 +1,32 @@
 # Kopi Kita
 
-Kopi Kita is a coffee shop website built as the first guided project for Module 1: Setup Vibe Coding Tools. The project proves that the development workflow is ready: Codex edits the project files, Git records the changes, and GitHub stores the public repository.
+Frontend kedai kopi untuk Task 1 Modul 2 AI Class Jogja. Desain diadaptasi dari template cafe yang disediakan, lalu seluruh identitas dan copywriting disesuaikan menjadi Kopi Kita.
 
-## Project Overview
+## Halaman
 
-Kopi Kita helps customers discover the coffee shop, browse products, and book a table before visiting. It also prepares an admin side so the shop owner can manage products and customer bookings from one place.
+- `/` — landing page dengan hero, menu favorit, informasi kedai, dan CTA.
+- `/menu` — delapan produk dari `src/lib/menu-data.ts`, filter kategori, harga Rupiah, serta status `Sold Out`.
+- `/booking` — form reservasi dengan validasi nama, WhatsApp, tanggal, waktu, dan jumlah tamu 1–8; data valid menampilkan kartu konfirmasi lokal tanpa dikirim ke server.
 
-## Main Features
+## Teknologi
 
-### Menu Page
-
-The menu page presents Kopi Kita products in a clear catalog format. Customers can browse coffee, non-coffee drinks, and food items with names, descriptions, categories, and prices.
-
-### Table Booking
-
-The booking feature lets customers reserve a table online. A booking flow should collect customer details, visit date, visit time, guest count, and booking notes so the team can prepare the table before the customer arrives.
-
-### CMS for Products and Bookings
-
-The CMS is planned for internal shop management. It should allow the admin team to:
-
-- Add, edit, and remove menu products.
-- Update product names, prices, categories, descriptions, and availability.
-- View incoming table bookings.
-- Manage booking status such as pending, confirmed, or cancelled.
-
-## Tech Stack
-
-- Next.js
+- Next.js 16 App Router
+- React 19
 - TypeScript
-- Tailwind CSS
-- Git and GitHub
-- Codex CLI for AI-assisted development
+- Tailwind CSS 4
 
-## Development
+## Menjalankan secara lokal
 
 ```bash
 npm install
 npm run dev
 ```
 
-Open `http://localhost:3000` in the browser to view the project locally.
+Buka [http://localhost:3000](http://localhost:3000).
 
-## Module 1 Submission Notes
+## Verifikasi
 
-This repository is the public `kopi-kita` repo required for Task 1. This README describes the Kopi Kita project as a coffee shop website with a menu page, table booking, and a CMS for managing products and bookings, created through a Codex-assisted session instead of the GitHub web editor.
+```bash
+npm run lint
+npm run build
+```
