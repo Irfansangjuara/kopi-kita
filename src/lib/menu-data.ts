@@ -30,7 +30,7 @@ export const menuItems: ReadonlyArray<MenuItem> = [
     description: 'Espresso tegas berpadu susu creamy untuk teman setiap suasana.',
     price: 25000,
     category: 'kopi',
-    image: '/template/menu/kopi-susu-kita.jpg',
+    image: 'https://images.unsplash.com/photo-1561047029-3000c68339ca?w=600&h=600&fit=crop',
     available: true,
   },
   {
@@ -39,7 +39,7 @@ export const menuItems: ReadonlyArray<MenuItem> = [
     description: 'Espresso hitam yang bersih dan bold untuk menyegarkan harimu.',
     price: 18000,
     category: 'kopi',
-    image: '/template/menu/americano-kita.jpg',
+    image: 'https://images.unsplash.com/photo-1510707577719-ae7c14805e3a?w=600&h=600&fit=crop',
     available: true,
   },
   {
@@ -48,7 +48,7 @@ export const menuItems: ReadonlyArray<MenuItem> = [
     description: 'Kopi susu dingin dengan manis legit gula aren pilihan.',
     price: 27000,
     category: 'kopi',
-    image: '/template/menu/es-kopi-gula-aren.jpg',
+    image: 'https://images.unsplash.com/photo-1461023058943-07fcbe16d735?w=600&h=600&fit=crop',
     available: true,
   },
   {
@@ -57,7 +57,7 @@ export const menuItems: ReadonlyArray<MenuItem> = [
     description: 'Matcha harum dan susu lembut menghadirkan rasa yang menenangkan.',
     price: 28000,
     category: 'non-kopi',
-    image: '/template/menu/matcha-latte.jpg',
+    image: 'https://images.unsplash.com/photo-1515823064-d6e0c04616a7?w=600&h=600&fit=crop',
     available: true,
   },
   {
@@ -66,7 +66,7 @@ export const menuItems: ReadonlyArray<MenuItem> = [
     description: 'Cokelat pekat yang hangat dengan rasa manis seimbang.',
     price: 24000,
     category: 'non-kopi',
-    image: '/template/menu/coklat-panas.jpg',
+    image: 'https://images.unsplash.com/photo-1542990253-0d0f5be5f0ed?w=600&h=600&fit=crop',
     available: true,
   },
   {
