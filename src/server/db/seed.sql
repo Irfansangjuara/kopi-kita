@@ -25,7 +25,7 @@ INSERT INTO products (name, description, price, category, image_url, available) 
 -- Admin account
 -- email: admin@kopikita.id  |  password: kopikita-admin
 INSERT INTO admins (email, password_hash) VALUES
-  ('admin@kopikita.id', '$2b$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy');
+  ('admin@kopikita.id', '$2b$10$DVlExCpiKgSJmM2oMR3BA.9009VIV4NPDyts5BGvYNkWD7Cof/y6i');
 
 -- 5 sample bookings with varied dates and statuses
 INSERT INTO bookings (customer_name, whatsapp, booking_date, booking_time, party_size, notes, status) VALUES
