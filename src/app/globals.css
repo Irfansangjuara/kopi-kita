@@ -1,26 +1,135 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --color-cream: #FAF3E0;
+  --color-dark-brown: #4A2C2A;
+  --color-light-brown: #8B5A2B;
+  --color-accent: #D4A574;
+  --background: #FAF3E0;
+  --foreground: #4A2C2A;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+  --color-cream: #FAF3E0;
+  --color-dark-brown: #4A2C2A;
+  --color-light-brown: #8B5A2B;
+  --color-accent: #D4A574;
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  scroll-behavior: smooth;
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: 'Inter', Arial, Helvetica, sans-serif;
+  line-height: 1.6;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--color-cream);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--color-accent);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-light-brown);
+}
+
+/* Animation classes */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.animate-fade-in-up {
+  animation: fadeInUp 0.6s ease-out forwards;
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.6s ease-out forwards;
+}
+
+/* Hero overlay gradient */
+.hero-overlay {
+  background: linear-gradient(
+    to bottom,
+    rgba(74, 44, 42, 0.6) 0%,
+    rgba(74, 44, 42, 0.4) 50%,
+    rgba(74, 44, 42, 0.7) 100%
+  );
+}
+
+/* Product card hover effect */
+.product-card:hover .product-overlay {
+  opacity: 1;
+}
+
+.product-card:hover img {
+  transform: scale(1.05);
+}
+
+/* Button hover effect */
+.btn-primary {
+  background-color: var(--color-dark-brown);
+  color: var(--color-cream);
+  transition: all 0.3s ease;
+}
+
+.btn-primary:hover {
+  background-color: var(--color-light-brown);
+  transform: translateY(-2px);
+}
+
+/* Category filter button */
+.filter-btn {
+  transition: all 0.3s ease;
+}
+
+.filter-btn.active {
+  background-color: var(--color-dark-brown);
+  color: var(--color-cream);
+}
+
+/* Form input focus */
+input:focus,
+textarea:focus,
+select:focus {
+  outline: none;
+  border-color: var(--color-accent);
+  box-shadow: 0 0 0 3px rgba(212, 165, 116, 0.2);
 }
