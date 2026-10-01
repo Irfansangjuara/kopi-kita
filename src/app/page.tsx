@@ -117,7 +117,7 @@ export default function Home() {
             </div>
             <div className="text-center md:text-left">
               <blockquote className="quote-text">
-                "A cup of coffee shared with a friend is happiness tasted and time well spent."
+                &ldquo;A cup of coffee shared with a friend is happiness tasted and time well spent.&rdquo;
               </blockquote>
             </div>
           </div>
