@@ -1,7 +1,8 @@
 'use client';
 
-import { useState, FormEvent } from 'react';
+import { useState, type FormEvent } from 'react';
 import { useRouter } from 'next/navigation';
+import { apiFetch } from '@/lib/api';
 
 export default function AdminLoginPage() {
   const router = useRouter();
@@ -16,24 +17,14 @@ export default function AdminLoginPage() {
     setLoading(true);
 
     try {
-      const res = await fetch('http://localhost:4000/api/auth/login', {
+      await apiFetch('/api/auth/login', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        credentials: 'include',
         body: JSON.stringify({ email, password }),
       });
-
-      if (res.ok) {
-        router.push('/admin');
-      } else {
-        const data = await res.json();
-        setError(data.error || 'Login gagal. Periksa email dan password Anda.');
-      }
-    } catch (err) {
-      console.error('Login error:', err);
-      setError('Terjadi kesalahan. Pastikan API server berjalan di port 4000.');
+      router.push('/admin');
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : String(err);
+      setError(msg || 'Login gagal. Periksa email dan password Anda.');
     } finally {
       setLoading(false);
     }
@@ -95,9 +86,7 @@ export default function AdminLoginPage() {
 
         <div className="mt-6 text-center text-sm text-gray-500">
           <p>Demo credentials:</p>
-          <p className="font-mono text-xs mt-1">
-            admin@kopikita.id / kopikita-admin
-          </p>
+          <p className="font-mono text-xs mt-1">admin@kopikita.id / kopikita-admin</p>
         </div>
       </div>
     </div>

@@ -3,12 +3,9 @@
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useState } from 'react';
+import { apiFetch } from '@/lib/api';
 
-export default function AdminLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const router = useRouter();
   const [isLoggingOut, setIsLoggingOut] = useState(false);
@@ -16,18 +13,12 @@ export default function AdminLayout({
   const handleLogout = async () => {
     setIsLoggingOut(true);
     try {
-      const res = await fetch('http://localhost:4000/api/auth/logout', {
-        method: 'POST',
-        credentials: 'include',
-      });
-      if (res.ok) {
-        router.push('/admin/login');
-      }
-    } catch (error) {
-      console.error('Logout failed:', error);
-      alert('Logout gagal. Silakan coba lagi.');
+      await apiFetch('/api/auth/logout', { method: 'POST' });
+    } catch {
+      // Ignore errors — proceed to login regardless
     } finally {
       setIsLoggingOut(false);
+      router.push('/admin/login');
     }
   };
 
@@ -52,9 +43,7 @@ export default function AdminLayout({
                 key={item.href}
                 href={item.href}
                 className={`block px-4 py-3 rounded-lg transition-colors ${
-                  isActive
-                    ? 'bg-amber-800 font-semibold'
-                    : 'hover:bg-amber-800/50'
+                  isActive ? 'bg-amber-800 font-semibold' : 'hover:bg-amber-800/50'
                 }`}
               >
                 <span className="mr-2">{item.icon}</span>
@@ -69,12 +58,12 @@ export default function AdminLayout({
             disabled={isLoggingOut}
             className="w-full px-4 py-3 bg-red-600 hover:bg-red-700 disabled:bg-red-800 rounded-lg transition-colors font-medium"
           >
-            {isLoggingOut ? 'Logging out...' : '🚪 Logout'}
+            {isLoggingOut ? 'Logging out…' : '🚪 Logout'}
           </button>
         </div>
       </aside>
 
-      {/* Main Content */}
+      {/* Main content */}
       <main className="flex-1 p-8">
         <div className="max-w-6xl mx-auto">{children}</div>
       </main>

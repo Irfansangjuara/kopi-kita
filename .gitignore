@@ -30,8 +30,13 @@ yarn-debug.log*
 yarn-error.log*
 .pnpm-debug.log*
 
-# env files (can opt-in for committing if needed)
-.env*
+# env files — NEVER commit real secrets
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+# .env.example is intentionally committed (template without secrets)
 !.env.example
 !api/.env.example
 
@@ -42,7 +47,7 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
-# api
+# api (legacy separate folder — kept for reference)
 /api/node_modules/
 /api/dist/
 /api/.env

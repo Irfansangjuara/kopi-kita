@@ -184,6 +184,69 @@ export default function Home() {
           </div>
         </div>
       </section>
+
+      {/* ── Customer Testimonials ── */}
+      <section className="mx-auto w-full max-w-7xl px-4 py-16 sm:px-8 sm:py-20 lg:px-10 lg:py-24">
+        <header className="mb-10 text-center">
+          <p className="mb-2 text-xs font-bold uppercase tracking-[0.3em] text-light-brown">
+            Kata Mereka
+          </p>
+          <h2 className="text-3xl font-bold tracking-[0.1em] sm:text-4xl text-dark-brown">
+            TESTIMONIALS
+          </h2>
+        </header>
+        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          {[
+            {
+              name: 'Aditya Pratama',
+              role: 'Mahasiswa UGM',
+              stars: 5,
+              quote:
+                'Kopi Susu Kita-nya selalu jadi teman belajar paling setia. Rasanya konsisten enak setiap kali datang, dan suasananya bikin betah berlama-lama.',
+            },
+            {
+              name: 'Rina Kusuma',
+              role: 'Fotografer Freelance',
+              stars: 5,
+              quote:
+                'Tempat favoritku buat meeting klien. Kopinya premium, WiFi kencang, dan staff-nya ramah. Booking meja lewat website juga gampang banget!',
+            },
+            {
+              name: 'Bimo Santoso',
+              role: 'Software Engineer',
+              stars: 5,
+              quote:
+                'Es Kopi Gula Aren-nya juara! Manisnya pas, kopinya nendang. Sudah jadi ritual setiap Sabtu pagi untuk nge-code sambil ngopi di sini.',
+            },
+          ].map(({ name, role, stars, quote }) => (
+            <article
+              key={name}
+              className="rounded-sm border border-[#4A2C2A]/10 bg-[#fffdf8] p-6 shadow-[0_4px_24px_rgba(74,44,42,0.07)]"
+            >
+              <div className="mb-4 flex gap-0.5" aria-label={`${stars} bintang`}>
+                {Array.from({ length: stars }).map((_, i) => (
+                  <svg
+                    key={i}
+                    aria-hidden="true"
+                    viewBox="0 0 20 20"
+                    fill="currentColor"
+                    className="h-5 w-5 text-[#D9822B]"
+                  >
+                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                  </svg>
+                ))}
+              </div>
+              <blockquote className="mb-5 text-sm leading-7 text-[#4A2C2A]/80">
+                &ldquo;{quote}&rdquo;
+              </blockquote>
+              <footer className="flex flex-col">
+                <cite className="not-italic text-sm font-bold text-[#4A2C2A]">{name}</cite>
+                <span className="text-xs text-[#4A2C2A]/55">{role}</span>
+              </footer>
+            </article>
+          ))}
+        </div>
+      </section>
     </>
   );
 }

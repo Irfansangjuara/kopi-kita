@@ -6,16 +6,25 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "next lint",
+    "db:reset": "docker compose exec db psql -U kopikita -d kopikita -f /dev/stdin < src/server/db/schema.sql && docker compose exec db psql -U kopikita -d kopikita -f /dev/stdin < src/server/db/seed.sql"
   },
   "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "cookie-parser": "^1.4.6",
+    "express": "^4.18.2",
     "next": "16.3.8",
+    "pg": "^8.11.3",
     "react": "19.2.8",
     "react-dom": "19.2.8"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
+    "@types/bcryptjs": "^2.4.6",
+    "@types/cookie-parser": "^1.4.6",
+    "@types/express": "^4.17.21",
     "@types/node": "^20",
+    "@types/pg": "^8.10.9",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "eslint": "^9",

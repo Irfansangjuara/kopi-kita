@@ -2,57 +2,43 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { apiFetch } from '@/lib/api';
 
-interface DashboardStats {
-  productsCount: number;
-  pendingBookingsCount: number;
+interface Booking {
+  status: string;
 }
 
 export default function AdminDashboardPage() {
   const router = useRouter();
-  const [stats, setStats] = useState<DashboardStats | null>(null);
+  const [productsCount, setProductsCount] = useState<number | null>(null);
+  const [pendingCount, setPendingCount] = useState<number | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    checkAuth();
-  }, []);
-
-  const checkAuth = async () => {
-    try {
-      const res = await fetch('http://localhost:4000/api/auth/me', {
-        credentials: 'include',
-      });
-      if (!res.ok) {
+    (async () => {
+      try {
+        // Check session first
+        await apiFetch('/api/auth/me');
+      } catch {
         router.push('/admin/login');
         return;
       }
-      await fetchStats();
-    } catch (error) {
-      console.error('Auth check failed:', error);
-      router.push('/admin/login');
-    }
-  };
 
-  const fetchStats = async () => {
-    try {
-      const [productsRes, bookingsRes] = await Promise.all([
-        fetch('http://localhost:4000/api/products', { credentials: 'include' }),
-        fetch('http://localhost:4000/api/bookings', { credentials: 'include' }),
-      ]);
-
-      const products = await productsRes.json();
-      const bookings = await bookingsRes.json();
-
-      setStats({
-        productsCount: products.length,
-        pendingBookingsCount: bookings.filter((b: any) => b.status === 'pending').length,
-      });
-    } catch (error) {
-      console.error('Failed to fetch stats:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
+      try {
+        const [products, bookings] = await Promise.all([
+          apiFetch<unknown[]>('/api/products'),
+          apiFetch<Booking[]>('/api/bookings'),
+        ]);
+        setProductsCount(products.length);
+        setPendingCount(bookings.filter((b) => b.status === 'pending').length);
+      } catch (err) {
+        console.error('Failed to fetch stats:', err);
+      } finally {
+        setLoading(false);
+      }
+    })();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   if (loading) {
     return (
@@ -71,7 +57,7 @@ export default function AdminDashboardPage() {
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm font-medium text-gray-600 mb-1">Total Produk</p>
-              <p className="text-4xl font-bold text-amber-900">{stats?.productsCount || 0}</p>
+              <p className="text-4xl font-bold text-amber-900">{productsCount ?? 0}</p>
             </div>
             <div className="text-5xl">☕</div>
           </div>
@@ -81,7 +67,7 @@ export default function AdminDashboardPage() {
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm font-medium text-gray-600 mb-1">Booking Pending</p>
-              <p className="text-4xl font-bold text-orange-600">{stats?.pendingBookingsCount || 0}</p>
+              <p className="text-4xl font-bold text-orange-600">{pendingCount ?? 0}</p>
             </div>
             <div className="text-5xl">📅</div>
           </div>

@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { apiFetch } from '@/lib/api';
 
 interface Product {
   id: number;
@@ -21,91 +22,60 @@ export default function AdminProductsPage() {
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
 
   useEffect(() => {
-    checkAuth();
-  }, []);
-
-  const checkAuth = async () => {
-    try {
-      const res = await fetch('http://localhost:4000/api/auth/me', {
-        credentials: 'include',
-      });
-      if (!res.ok) {
+    (async () => {
+      try {
+        await apiFetch('/api/auth/me');
+      } catch {
         router.push('/admin/login');
         return;
       }
       await fetchProducts();
-    } catch (error) {
-      router.push('/admin/login');
-    }
-  };
+    })();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const fetchProducts = async () => {
     try {
-      const res = await fetch('http://localhost:4000/api/products', {
-        credentials: 'include',
-      });
-      const data = await res.json();
+      const data = await apiFetch<Product[]>('/api/products');
       setProducts(data);
-    } catch (error) {
-      console.error('Failed to fetch products:', error);
+    } catch (err) {
+      console.error('Failed to fetch products:', err);
     } finally {
       setLoading(false);
     }
   };
 
-  const handleAddProduct = () => {
-    setEditingProduct(null);
-    setShowModal(true);
-  };
-
-  const handleEditProduct = (product: Product) => {
-    setEditingProduct(product);
-    setShowModal(true);
+  const handleToggleAvailable = async (product: Product) => {
+    try {
+      await apiFetch(`/api/products/${product.id}`, {
+        method: 'PUT',
+        body: JSON.stringify({ ...product, available: !product.available }),
+      });
+      await fetchProducts();
+    } catch (err) {
+      console.error('Failed to toggle availability:', err);
+    }
   };
 
   const handleDeleteProduct = async (id: number) => {
     if (!confirm('Yakin ingin menghapus produk ini?')) return;
-
     try {
-      const res = await fetch(`http://localhost:4000/api/products/${id}`, {
-        method: 'DELETE',
-        credentials: 'include',
-      });
-      if (res.ok) {
-        await fetchProducts();
-      }
-    } catch (error) {
-      console.error('Failed to delete product:', error);
+      await apiFetch(`/api/products/${id}`, { method: 'DELETE' });
+      await fetchProducts();
+    } catch (err) {
+      console.error('Failed to delete product:', err);
       alert('Gagal menghapus produk');
     }
   };
 
-  const handleToggleAvailable = async (product: Product) => {
-    try {
-      const res = await fetch(`http://localhost:4000/api/products/${product.id}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
-        body: JSON.stringify({ ...product, available: !product.available }),
-      });
-      if (res.ok) {
-        await fetchProducts();
-      }
-    } catch (error) {
-      console.error('Failed to toggle availability:', error);
-    }
-  };
-
-  if (loading) {
-    return <div className="text-center py-12">Loading...</div>;
-  }
+  if (loading) return <div className="text-center py-12">Loading...</div>;
 
   return (
     <div>
       <div className="flex items-center justify-between mb-8">
         <h1 className="text-3xl font-bold text-gray-900">Kelola Produk</h1>
         <button
-          onClick={handleAddProduct}
+          onClick={() => { setEditingProduct(null); setShowModal(true); }}
           className="px-6 py-3 bg-amber-700 hover:bg-amber-800 text-white font-semibold rounded-lg transition-colors"
         >
           + Tambah Produk
@@ -140,9 +110,7 @@ export default function AdminProductsPage() {
                   <button
                     onClick={() => handleToggleAvailable(product)}
                     className={`px-3 py-1 rounded-full text-xs font-medium ${
-                      product.available
-                        ? 'bg-green-100 text-green-800'
-                        : 'bg-gray-100 text-gray-800'
+                      product.available ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'
                     }`}
                   >
                     {product.available ? 'Tersedia' : 'Habis'}
@@ -150,7 +118,7 @@ export default function AdminProductsPage() {
                 </td>
                 <td className="px-6 py-4">
                   <button
-                    onClick={() => handleEditProduct(product)}
+                    onClick={() => { setEditingProduct(product); setShowModal(true); }}
                     className="text-blue-600 hover:text-blue-800 mr-4 font-medium"
                   >
                     Edit
@@ -172,10 +140,7 @@ export default function AdminProductsPage() {
         <ProductModal
           product={editingProduct}
           onClose={() => setShowModal(false)}
-          onSuccess={() => {
-            setShowModal(false);
-            fetchProducts();
-          }}
+          onSuccess={() => { setShowModal(false); fetchProducts(); }}
         />
       )}
     </div>
@@ -192,40 +157,27 @@ function ProductModal({
   onSuccess: () => void;
 }) {
   const [formData, setFormData] = useState<Partial<Product>>(
-    product || {
-      name: '',
-      description: '',
-      price: 0,
-      category: 'kopi',
-      image_url: '',
-      available: true,
-    }
+    product ?? { name: '', description: '', price: 0, category: 'kopi', image_url: '', available: true },
   );
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
     try {
-      const url = product
-        ? `http://localhost:4000/api/products/${product.id}`
-        : 'http://localhost:4000/api/products';
-      const method = product ? 'PUT' : 'POST';
-
-      const res = await fetch(url, {
-        method,
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
-        body: JSON.stringify(formData),
-      });
-
-      if (res.ok) {
-        onSuccess();
+      if (product) {
+        await apiFetch(`/api/products/${product.id}`, {
+          method: 'PUT',
+          body: JSON.stringify(formData),
+        });
       } else {
-        alert('Gagal menyimpan produk');
+        await apiFetch('/api/products', {
+          method: 'POST',
+          body: JSON.stringify(formData),
+        });
       }
-    } catch (error) {
-      console.error('Failed to save product:', error);
-      alert('Terjadi kesalahan');
+      onSuccess();
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : String(err);
+      alert(`Gagal menyimpan produk: ${msg}`);
     }
   };
 
@@ -235,41 +187,31 @@ function ProductModal({
         <h2 className="text-2xl font-bold text-gray-900 mb-6">
           {product ? 'Edit Produk' : 'Tambah Produk'}
         </h2>
-
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">Nama Produk</label>
             <input
-              type="text"
-              required
-              value={formData.name}
+              type="text" required value={formData.name}
               onChange={(e) => setFormData({ ...formData, name: e.target.value })}
               className="w-full px-4 py-2 border rounded-lg"
             />
           </div>
-
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">Deskripsi</label>
             <textarea
-              required
-              value={formData.description}
+              required value={formData.description}
               onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-              className="w-full px-4 py-2 border rounded-lg"
-              rows={3}
+              className="w-full px-4 py-2 border rounded-lg" rows={3}
             />
           </div>
-
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">Harga (Rupiah)</label>
             <input
-              type="number"
-              required
-              value={formData.price}
+              type="number" required value={formData.price}
               onChange={(e) => setFormData({ ...formData, price: Number(e.target.value) })}
               className="w-full px-4 py-2 border rounded-lg"
             />
           </div>
-
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">Kategori</label>
             <select
@@ -282,40 +224,29 @@ function ProductModal({
               <option value="pastry">Pastry</option>
             </select>
           </div>
-
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">URL Gambar</label>
             <input
-              type="text"
-              required
-              value={formData.image_url}
+              type="text" required value={formData.image_url}
               onChange={(e) => setFormData({ ...formData, image_url: e.target.value })}
               className="w-full px-4 py-2 border rounded-lg"
             />
           </div>
-
           <div className="flex items-center">
             <input
-              type="checkbox"
-              checked={formData.available}
+              type="checkbox" checked={formData.available}
               onChange={(e) => setFormData({ ...formData, available: e.target.checked })}
               className="mr-2"
             />
             <label className="text-sm font-medium text-gray-700">Produk tersedia</label>
           </div>
-
           <div className="flex gap-3 pt-4">
-            <button
-              type="button"
-              onClick={onClose}
-              className="flex-1 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50"
-            >
+            <button type="button" onClick={onClose}
+              className="flex-1 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50">
               Batal
             </button>
-            <button
-              type="submit"
-              className="flex-1 px-4 py-2 bg-amber-700 text-white rounded-lg hover:bg-amber-800"
-            >
+            <button type="submit"
+              className="flex-1 px-4 py-2 bg-amber-700 text-white rounded-lg hover:bg-amber-800">
               Simpan
             </button>
           </div>
