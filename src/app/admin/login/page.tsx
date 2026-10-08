@@ -84,10 +84,9 @@ export default function AdminLoginPage() {
           </button>
         </form>
 
-        <div className="mt-6 text-center text-sm text-gray-500">
-          <p>Demo credentials:</p>
-          <p className="font-mono text-xs mt-1">admin@kopikita.id / kopikita-admin</p>
-        </div>
+        <p className="mt-6 text-center text-xs text-gray-400">
+          Staff access only. If you cannot sign in, contact the shop owner.
+        </p>
       </div>
     </div>
   );
