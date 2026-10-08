@@ -5,8 +5,10 @@ import {
   type FocusEvent,
   type FormEvent,
   useMemo,
+  useRef,
   useState,
 } from 'react';
+import posthog from 'posthog-js';
 import { apiFetch } from '@/lib/api';
 
 type BookingDetails = {
@@ -131,6 +133,7 @@ export default function BookingForm() {
   const [submitting, setSubmitting] = useState(false);
   const [apiError, setApiError] = useState<string | null>(null);
   const [confirmed, setConfirmed] = useState<BookingResponse | null>(null);
+  const bookingStartedRef = useRef(false);
 
   const errors = useMemo(() => validateBooking(details, today), [details, today]);
   const isValid = today !== '' && Object.keys(errors).length === 0;
@@ -139,6 +142,12 @@ export default function BookingForm() {
     event: ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>,
   ) {
     const field = event.target.name as FieldName;
+
+    if (!bookingStartedRef.current) {
+      bookingStartedRef.current = true;
+      posthog.capture('booking_started', { source_page: '/booking' });
+    }
+
     setDetails((current) => ({ ...current, [field]: event.target.value }));
   }
 
@@ -175,6 +184,10 @@ export default function BookingForm() {
           party_size: Number(details.partySize),
           notes: details.notes.trim() || undefined,
         }),
+      });
+      posthog.capture('booking_submitted', {
+        party_size: booking.party_size,
+        time_slot: booking.booking_time,
       });
       setConfirmed(booking);
     } catch (err: unknown) {

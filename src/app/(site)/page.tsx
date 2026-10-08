@@ -1,5 +1,6 @@
 import Image from 'next/image';
 import Link from 'next/link';
+import CtaButton from '@/components/cta-button';
 
 const favorites = [
   {
@@ -84,9 +85,7 @@ export default function Home() {
             <Link href="/menu" className="button button--solid">
               Lihat Menu <ArrowIcon />
             </Link>
-            <Link href="/booking" className="button button--outline">
-              Booking Meja
-            </Link>
+            <CtaButton className="button button--outline" />
           </div>
         </div>
       </section>

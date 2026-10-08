@@ -10,11 +10,16 @@
     "db:reset": "docker compose exec db psql -U kopikita -d kopikita -f /dev/stdin < src/server/db/schema.sql && docker compose exec db psql -U kopikita -d kopikita -f /dev/stdin < src/server/db/seed.sql"
   },
   "dependencies": {
+    "@posthog/react": "^1.11.3",
+    "@sentry/nextjs": "^11.5.0",
+    "@vercel/analytics": "^2.0.1",
+    "@vercel/speed-insights": "^2.0.0",
     "bcryptjs": "^2.4.3",
     "cookie-parser": "^1.4.6",
     "express": "^4.18.2",
     "next": "16.3.8",
     "pg": "^8.11.3",
+    "posthog-js": "^1.438.2",
     "react": "19.2.8",
     "react-dom": "19.2.8"
   },

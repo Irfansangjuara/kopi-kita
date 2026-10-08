@@ -45,10 +45,12 @@ yarn-error.log*
 
 # typescript
 *.tsbuildinfo
-next-env.d.ts
 
 # api (legacy separate folder — kept for reference)
 /api/node_modules/
 /api/dist/
 /api/.env
 .env*
+
+# local self-referencing symlink created by an editor tool
+/Kopi Kita

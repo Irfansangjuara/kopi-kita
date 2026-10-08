@@ -9,7 +9,8 @@
  */
 
 import Image from 'next/image';
-import { useEffect, useState } from 'react';
+import posthog from 'posthog-js';
+import { useEffect, useRef, useState } from 'react';
 import { apiFetch } from '@/lib/api';
 import ProductCard from '@/components/product-card';
 import type { MenuCategoryFilter, MenuCategoryOption, MenuItem } from '@/lib/menu-data';
@@ -69,6 +70,15 @@ export default function MenuPage() {
     data?: MenuItem[];
     error?: string;
   }>({ key: '' });
+
+  const menuViewedRef = useRef(false);
+
+  useEffect(() => {
+    if (menuViewedRef.current) return;
+
+    menuViewedRef.current = true;
+    posthog.capture('menu_viewed', { category: activeCategory });
+  }, [activeCategory]);
 
   // loading is DERIVED — never set with setState inside useEffect
   const loading = result.key !== key;
