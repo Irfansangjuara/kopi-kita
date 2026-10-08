@@ -53,12 +53,11 @@ router.post('/login', async (req, res) => {
         ? forwarded.split(',')[0].trim()
         : req.ip ?? 'unknown';
     const attemptKey = `${email.toLowerCase()}:${ip}`;
-    const windowStart = new Date(Date.now() - RATE_LIMIT_WINDOW_MINUTES * 60 * 1000);
     await ensureLoginAttemptsTable(pool);
 
     const recentFailures = await pool.query<{ failures: number }>(
-      'SELECT COUNT(*)::int AS failures FROM login_attempts WHERE key = $1 AND created_at > $2',
-      [attemptKey, windowStart],
+      `SELECT COUNT(*)::int AS failures FROM login_attempts WHERE key = $1 AND created_at > NOW() - INTERVAL '15 minutes'`,
+      [attemptKey],
     );
 
     if (recentFailures.rows[0].failures >= RATE_LIMIT_MAX_FAILURES) {
