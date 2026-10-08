@@ -1,4 +1,24 @@
 # OWASP ZAP baseline rules for Kopi Kita.
-# One line per alert: <rule id><TAB>IGNORE<WARN|FAIL><TAB>(reason)
-# Every IGNORE line below has its reason written in security/temuan-w2m4.md.
-# Empty for now: the first run has not told us which alerts are acceptable yet.
+# Format: <rule id><TAB>IGNORE<WARN|FAIL><TAB>(reason)
+# Every IGNORE line below has the same reason written in security/temuan-w2m4.md,
+# and none of them is there "just to get the pipeline green".
+
+# CSP still allows inline scripts and styles. The nonce-based CSP from the
+# Next.js docs needs dynamic rendering for every page; Kopi Kita is statically
+# rendered, so the documented nonce-free variant was used. Accepted risk with a
+# written next step (tighten CSP when the app grows server-rendered pages).
+10055	IGNORE	(CSP uses 'unsafe-inline' for script-src and style-src: nonce-based CSP requires dynamic rendering; recorded as an accepted risk with a next step)
+
+# Cross-origin isolation: COOP and CORP are now sent (PR fix/sec-cross-origin-headers).
+# COEP require-corp stays off on purpose - it would block the PostHog assets
+# from us-assets.i.posthog.com, which do not carry CORP headers.
+90004	IGNORE	(COEP require-corp intentionally not sent: it would break PostHog assets; COOP and CORP are sent instead)
+
+# Informational findings, no action: ZAP recognises the framework, and the
+# cache directives it reports come from Next.js asset handling.
+10109	IGNORE	(Informational: ZAP identifies the site as a modern web application)
+10049	IGNORE	(Informational: cache directives come from Next.js asset handling, no secrets or personal data in them)
+
+# The only user-controlled value echoed into a page is ?category= on /menu; the
+# client allow-lists the tabs and the API binds the value as a query parameter.
+10031	IGNORE	(Informational: reflected parameter is the allow-listed ?category= on /menu, bound as a SQL parameter, no injection path)
