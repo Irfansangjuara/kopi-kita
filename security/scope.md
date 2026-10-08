@@ -34,4 +34,4 @@
 
 I have read this statement, I understand the limits, and I will follow them.
 
-**Signature:** ______________________________  **Date:** ______________
+**Signature:** *Signed (Irfan Sangjuara)* &nbsp;·&nbsp; **Date:** 2026-10-08 &nbsp;·&nbsp; **Signed document:** [scope.pdf](./scope.pdf) / [scope-signed.png](./scope-signed.png)
