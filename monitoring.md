@@ -24,10 +24,10 @@ Production: <https://kopikita.copilotmarketing.id> · Health: <https://kopikita.
 
 ## Production health
 
-- `GET /api/health` runs `SELECT 1` on the existing pool, always re-runs (`dynamic = 'force-dynamic'`, `no-store`), answers `{"status":"ok"}` with 200, or `{"status":"error"}` with 503 without exposing error details or the connection string.
-- Uptime monitor `10574554` "Kopi Kita production health" -> `https://kopikita.copilotmarketing.id/api/health`, every 5 minutes, currently active and up.
-- Alert proof: a second monitor pointed at `/api/health-does-not-exist` on purpose; it went down and Sentry raised **KOPI-KITA-2** ("Downtime detected..."). That temporary monitor was deleted after the proof (202). The alert email lands in the owner's inbox: **screenshot still to be attached by the owner**.
-- Sentry alerting: org detectors "Error Monitor" and "Issue Stream: All Projects" are enabled, so new high-priority issues notify the account owner by email.
+ - `GET /api/health` runs `SELECT 1` on the existing pool, always re-runs (`dynamic = 'force-dynamic'`, `no-store`), answers `{"status":"ok"}` with 200, or `{"status":"error"}` with 503 without exposing error details or the connection string.
+ - Uptime monitor `10574554` "Kopi Kita production health" -> `https://kopikita.copilotmarketing.id/api/health`, every 5 minutes, currently active and up.
+ - Alert proof: a second monitor pointed at `/api/health-does-not-exist` on purpose; it went down and Sentry raised **KOPI-KITA-2** ("Downtime detected..."). That temporary monitor was deleted after the proof (202). The alert email lands in the owner's inbox: **screenshot still to be attached by the owner**.
+ - Sentry alerting: org detectors "Error Monitor" and "Issue Stream: All Projects" are enabled, so new high-priority issues notify the account owner by email.
 
 ## Known open defect (visible in Sentry, not yet fixed)
 
@@ -41,4 +41,4 @@ Reproduce: `curl -X POST -H 'Content-Type: application/json' --data '{bad json' 
 
 ## Evidence files
 
-`docs/evidence/`: PostHog dashboard, funnel, feature flag, Sentry issue list, the resolved KOPI-KITA-5 issue, and the uptime monitor page. Still missing: the alert email screenshot (owner), and the Vercel Speed Insights screenshot (needs a couple of days of visits).
+`docs/evidence/`: PostHog dashboard, funnel, feature flag, Sentry issue list, the resolved KOPI-KITA-5 issue, uptime monitor, Vercel Speed Insights, and Vercel Observability. Still missing: the alert email screenshot (owner).
