@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import { getPool } from '../db';
 import { requireAdmin } from '../middleware/auth';
+import { reportServerError } from '../observability';
 
 const router = Router();
 
@@ -51,7 +52,7 @@ router.post('/', async (req, res) => {
     );
     res.status(201).json(result.rows[0]);
   } catch (error) {
-    console.error('Error creating booking:', error);
+    reportServerError(error, 'Error creating booking');
     res.status(500).json({ error: 'Failed to create booking' });
   }
 });
@@ -65,7 +66,7 @@ router.get('/', requireAdmin, async (req, res) => {
     );
     res.json(result.rows);
   } catch (error) {
-    console.error('Error fetching bookings:', error);
+    reportServerError(error, 'Error fetching bookings');
     res.status(500).json({ error: 'Failed to fetch bookings' });
   }
 });
@@ -98,7 +99,7 @@ router.patch('/:id', requireAdmin, async (req, res) => {
     }
     res.json(result.rows[0]);
   } catch (error) {
-    console.error('Error updating booking:', error);
+    reportServerError(error, 'Error updating booking');
     res.status(500).json({ error: 'Failed to update booking' });
   }
 });

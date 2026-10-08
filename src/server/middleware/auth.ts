@@ -1,5 +1,6 @@
 import type { Request, Response, NextFunction } from 'express';
 import { getPool } from '../db';
+import { reportServerError } from '../observability';
 
 // Extend Express Request to carry the verified admin info
 declare global {
@@ -48,7 +49,7 @@ export const requireAdmin = async (
     };
     next();
   } catch (err) {
-    console.error('Session check error:', err);
+    reportServerError(err, 'Session check error');
     res.status(500).json({ error: 'Internal server error' });
   }
 };

@@ -1,4 +1,5 @@
 import pg from 'pg';
+import { reportServerError } from './observability';
 
 const { Pool } = pg;
 
@@ -18,7 +19,7 @@ export function getPool(): InstanceType<typeof Pool> {
       idleTimeoutMillis: 30000,
     });
     pool.on('error', (err) => {
-      console.error('Unexpected database error:', err);
+      reportServerError(err, 'Unexpected database error');
     });
   }
   return pool;

@@ -2,6 +2,7 @@ import { Router } from 'express';
 import bcrypt from 'bcryptjs';
 import { randomBytes } from 'crypto';
 import { getPool } from '../db';
+import { reportServerError } from '../observability';
 
 const router = Router();
 
@@ -50,7 +51,7 @@ router.post('/login', async (req, res) => {
 
     res.json({ message: 'Login successful', admin: { id: admin.id, email: admin.email } });
   } catch (error) {
-    console.error('Login error:', error);
+    reportServerError(error, 'Login error');
     res.status(500).json({ error: 'Login failed' });
   }
 });
@@ -64,7 +65,7 @@ router.post('/logout', async (req, res) => {
       await pool.query('DELETE FROM sessions WHERE id = $1', [sessionId]);
     } catch (err) {
       // Best-effort deletion; continue logout regardless
-      console.error('Session delete error:', err);
+      reportServerError(err, 'Session delete error');
     }
   }
   res.clearCookie('sessionId', { path: '/' });
@@ -96,7 +97,7 @@ router.get('/me', async (req, res) => {
     const { admin_id, email } = result.rows[0];
     res.json({ admin: { id: admin_id, email } });
   } catch (err) {
-    console.error('Auth/me error:', err);
+    reportServerError(err, 'Auth/me error');
     res.status(500).json({ error: 'Internal server error' });
   }
 });

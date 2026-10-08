@@ -9,6 +9,7 @@ import cookieParser from 'cookie-parser';
 import productsRouter from './routes/products';
 import bookingsRouter from './routes/bookings';
 import authRouter from './routes/auth';
+import { reportServerError } from './observability';
 
 const app = express();
 
@@ -35,7 +36,7 @@ app.use(
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     _next: express.NextFunction,
   ) => {
-    console.error('Unhandled error:', err);
+    reportServerError(err, 'Unhandled error');
     res.status(500).json({ error: 'Internal server error' });
   },
 );
