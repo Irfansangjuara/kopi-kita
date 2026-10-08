@@ -91,7 +91,10 @@ jobs:
         with:
           node-version: 22
           cache: npm
-      - run: npm ci --no-audit --no-fund
+      # --include=dev matters: NODE_ENV=production is set at job level, and a
+      # plain `npm ci` would then skip devDependencies (no typescript, so Next
+      # ignores the tsconfig `@/*` paths and the build fails).
+      - run: npm ci --include=dev --no-audit --no-fund
       - name: Fill the CI database with dummy data
         run: |
           PGPASSWORD=ci-dummy-password psql -h localhost -U kopikita -d kopikita -v ON_ERROR_STOP=1 -f src/server/db/schema.sql
@@ -134,7 +137,7 @@ jobs:
         with:
           node-version: 22
           cache: npm
-      - run: npm ci --no-audit --no-fund
+      - run: npm ci --include=dev --no-audit --no-fund
       - run: npm run build
       - run: npm install -g @lhci/cli@0.15.x
       - run: lhci autorun
