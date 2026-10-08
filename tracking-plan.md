@@ -25,10 +25,17 @@ The Metric depends directly on `booking_started` and `booking_submitted`. `cta_c
 
 ## Week 2 Findings
 
-Recordings available as of 2026-10-08: two, both from the developer's own production test session (sessions are listed under <https://us.posthog.com/project/652575/replay>). The required five-tester run has not happened yet, so this section is still to be completed with tester recordings.
+Recordings that exist on 2026-10-08: **two**, both from the developer's own production test sessions, so treat them as structural findings, not as evidence about real visitors. **Replace/extend them with the tester recordings once the 5-person run is done** (`07-cara-minta-5-tester.md`). Raw numbers below come from PostHog (`query-session-recordings-list`, `session-recording-get`, `query-funnel` via the PostHog MCP); the funnel timings come from insight `a1bQ2k97`.
 
-1. *(pending tester recording)*
-2. *(pending tester recording)*
-3. *(pending tester recording)*
+1. **The CTA is never clicked, so the A/B experiment has no signal yet.** `cta_clicked` = 0 events in 7 days and the flag `cta-landing` has only 2 evaluations (1 resolved to `test`, 1 unresolved `null`); `control` was never served. The funnel session shows the visitor walking `/` -> `/menu` -> `/booking` without touching the landing CTA, and it took **17s** from `menu_viewed` to `booking_started`. Recording: <https://us.posthog.com/project/652575/replay/01a11a3c-935c-7584-9af4-db4475e53271>
+   Backlog: get testers to enter through the landing page (not a direct link to `/booking`), otherwise the experiment cannot be read.
 
-Note for whoever fills this in: open the funnel step where people dropped, click through to the recordings of the people who did not continue, and link each finding to its recording URL (`https://us.posthog.com/project/652575/replay/<recording-id>`).
+2. **A console error fired inside the booking session and Sentry has no browser issue for it.** Recording metadata reports `console_error_count: 1` on the session that completed a booking, while Sentry received no browser exception in that window — so it is most likely a handled/network error rather than a crash. `/booking` is the critical step of the metric (`booking_started -> booking_submitted`), so it is worth clearing. Recording: <https://us.posthog.com/project/652575/replay/01a11a3c-935c-7584-9af4-db4475e53271>
+   Backlog: open the Console panel of that replay, reproduce locally, fix if it is ours.
+
+3. **The global error screen is a dead end.** The second recording sits on `/sentry-example-page` for 317s with only **0.17s** of activity, 0 keypresses and a single click — PostHog labelled it "Skipped: too inactive" — after the deliberate error was thrown. The screen offers only "Something went wrong / Try again", with no way back to the menu or booking form. Recording: <https://us.posthog.com/project/652575/replay/01a11a3d-f527-7f9b-aefe-951828d47149>
+   Backlog: add a link back to `/` and `/menu` in `src/app/global-error.tsx`.
+
+## Demo/sample data
+
+No synthetic visitors were sent to PostHog: the checkpoint asks for data from at least 5 real people, and fake sessions are easy to spot (one device, identical user agents, events seconds apart). If a populated-looking dashboard is needed for a demo (not for submission), the honest way is a separate, labelled run: send the synthetic visitors with a `demo` person property, then exclude them with PostHog's "Filter out internal and test accounts" so the reported metric stays real. Ask before doing it.
