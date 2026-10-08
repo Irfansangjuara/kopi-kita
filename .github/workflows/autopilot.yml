@@ -1,0 +1,145 @@
+name: autopilot
+
+on:
+  pull_request:
+  workflow_dispatch:
+  schedule:
+    - cron: "0 1 * * 1" # Monday 01:00 UTC = 08:00 WIB
+
+# Least privilege: jobs that need to write ask for it themselves.
+permissions:
+  contents: read
+
+jobs:
+  # ── Dependencies ───────────────────────────────────────────────────────────
+  deps:
+    name: deps (npm audit)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci --no-audit --no-fund
+      # || true so the artifact is uploaded even when findings exist; the
+      # fail-or-not decision belongs to the report stage, not here.
+      - run: npm audit --json > npm-audit.json || true
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: npm-audit
+          path: npm-audit.json
+
+  # ── Secrets in git history ─────────────────────────────────────────────────
+  secrets:
+    name: secrets (gitleaks)
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write # gitleaks-action comments on the PR
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0 # full history, or an old leak stays invisible
+      - uses: gitleaks/gitleaks-action@v3
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  # ── Static analysis ────────────────────────────────────────────────────────
+  sast:
+    name: sast (semgrep)
+    runs-on: ubuntu-latest
+    container:
+      image: semgrep/semgrep:1.180.0
+    steps:
+      - uses: actions/checkout@v7
+      - run: semgrep scan --config p/react --config p/typescript --config p/owasp-top-ten --metrics=off --json --output semgrep.json
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: semgrep
+          path: semgrep.json
+
+  # ── Dynamic analysis: ZAP baseline against a local build ───────────────────
+  # The database is a throwaway service container filled with seed data; the
+  # scanner never touches Neon, and the target is localhost, never a Vercel URL.
+  dast:
+    name: dast (ZAP baseline, localhost)
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_DB: kopikita
+          POSTGRES_USER: kopikita
+          POSTGRES_PASSWORD: ci-dummy-password
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U kopikita -d kopikita"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    env:
+      # CI dummy values only — never the Neon/production connection string.
+      DATABASE_URL: postgresql://kopikita:ci-dummy-password@localhost:5432/kopikita
+      NODE_ENV: production
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci --no-audit --no-fund
+      - name: Fill the CI database with dummy data
+        run: |
+          PGPASSWORD=ci-dummy-password psql -h localhost -U kopikita -d kopikita -v ON_ERROR_STOP=1 -f src/server/db/schema.sql
+          PGPASSWORD=ci-dummy-password psql -h localhost -U kopikita -d kopikita -v ON_ERROR_STOP=1 -f src/server/db/seed.sql
+      - run: npm run build
+      - name: Start the app and wait for it
+        run: |
+          nohup npm run start > /tmp/next-start.log 2>&1 &
+          for i in $(seq 1 30); do
+            if curl -sf http://localhost:3000/api/health > /dev/null; then
+              echo "app is up after ${i} checks"
+              exit 0
+            fi
+            sleep 2
+          done
+          echo "app did not become ready"
+          cat /tmp/next-start.log
+          exit 1
+      - name: ZAP baseline scan
+        uses: zaproxy/action-baseline@v0.15.0
+        with:
+          target: "http://localhost:3000"
+          rules_file_name: ".zap/rules.tsv"
+          fail_action: true
+          allow_issue_writing: false
+          artifact_name: zap_scan
+
+  # ── Quality: Lighthouse CI ─────────────────────────────────────────────────
+  # DATABASE_URL here is the CI-only Neon "ci" branch, set as a repository
+  # secret. It is never the production branch.
+  quality:
+    name: quality (Lighthouse CI)
+    runs-on: ubuntu-latest
+    env:
+      DATABASE_URL: ${{ secrets.DATABASE_URL }}
+      NODE_ENV: production
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci --no-audit --no-fund
+      - run: npm run build
+      - run: npm install -g @lhci/cli@0.15.x
+      - run: lhci autorun
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: lighthouse
+          path: .lighthouseci
