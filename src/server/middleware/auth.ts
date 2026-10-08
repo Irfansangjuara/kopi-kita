@@ -1,6 +1,7 @@
 import type { Request, Response, NextFunction } from 'express';
 import { getPool } from '../db';
 import { reportServerError } from '../observability';
+import { SESSION_COOKIE_NAME } from '../session-cookie';
 
 // Extend Express Request to carry the verified admin info
 declare global {
@@ -20,7 +21,7 @@ export const requireAdmin = async (
   res: Response,
   next: NextFunction,
 ) => {
-  const sessionId = req.cookies?.sessionId as string | undefined;
+  const sessionId = req.cookies?.[SESSION_COOKIE_NAME] as string | undefined;
 
   if (!sessionId) {
     res.status(401).json({ error: 'Unauthorized: No session' });
