@@ -1,0 +1,4 @@
+# OWASP ZAP baseline rules for Kopi Kita.
+# One line per alert: <rule id><TAB>IGNORE<WARN|FAIL><TAB>(reason)
+# Every IGNORE line below has its reason written in security/temuan-w2m4.md.
+# Empty for now: the first run has not told us which alerts are acceptable yet.
