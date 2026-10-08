@@ -19,7 +19,7 @@ export function getPool(): InstanceType<typeof Pool> {
       idleTimeoutMillis: 30000,
     });
     pool.on('error', (err) => {
-      reportServerError(err, 'Unexpected database error');
+      void reportServerError(err, 'Unexpected database error');
     });
   }
   return pool;

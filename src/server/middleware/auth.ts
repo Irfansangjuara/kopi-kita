@@ -49,7 +49,7 @@ export const requireAdmin = async (
     };
     next();
   } catch (err) {
-    reportServerError(err, 'Session check error');
+    await reportServerError(err, 'Session check error');
     res.status(500).json({ error: 'Internal server error' });
   }
 };

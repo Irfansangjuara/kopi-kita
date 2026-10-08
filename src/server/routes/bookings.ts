@@ -52,7 +52,7 @@ router.post('/', async (req, res) => {
     );
     res.status(201).json(result.rows[0]);
   } catch (error) {
-    reportServerError(error, 'Error creating booking');
+    await reportServerError(error, 'Error creating booking');
     res.status(500).json({ error: 'Failed to create booking' });
   }
 });
@@ -66,7 +66,7 @@ router.get('/', requireAdmin, async (req, res) => {
     );
     res.json(result.rows);
   } catch (error) {
-    reportServerError(error, 'Error fetching bookings');
+    await reportServerError(error, 'Error fetching bookings');
     res.status(500).json({ error: 'Failed to fetch bookings' });
   }
 });
@@ -99,7 +99,7 @@ router.patch('/:id', requireAdmin, async (req, res) => {
     }
     res.json(result.rows[0]);
   } catch (error) {
-    reportServerError(error, 'Error updating booking');
+    await reportServerError(error, 'Error updating booking');
     res.status(500).json({ error: 'Failed to update booking' });
   }
 });

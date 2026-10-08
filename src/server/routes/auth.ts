@@ -51,7 +51,7 @@ router.post('/login', async (req, res) => {
 
     res.json({ message: 'Login successful', admin: { id: admin.id, email: admin.email } });
   } catch (error) {
-    reportServerError(error, 'Login error');
+    await reportServerError(error, 'Login error');
     res.status(500).json({ error: 'Login failed' });
   }
 });
@@ -65,7 +65,7 @@ router.post('/logout', async (req, res) => {
       await pool.query('DELETE FROM sessions WHERE id = $1', [sessionId]);
     } catch (err) {
       // Best-effort deletion; continue logout regardless
-      reportServerError(err, 'Session delete error');
+      await reportServerError(err, 'Session delete error');
     }
   }
   res.clearCookie('sessionId', { path: '/' });
@@ -97,7 +97,7 @@ router.get('/me', async (req, res) => {
     const { admin_id, email } = result.rows[0];
     res.json({ admin: { id: admin_id, email } });
   } catch (err) {
-    reportServerError(err, 'Auth/me error');
+    await reportServerError(err, 'Auth/me error');
     res.status(500).json({ error: 'Internal server error' });
   }
 });

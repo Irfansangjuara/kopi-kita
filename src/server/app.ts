@@ -36,7 +36,7 @@ app.use(
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     _next: express.NextFunction,
   ) => {
-    reportServerError(err, 'Unhandled error');
+    void reportServerError(err, 'Unhandled error');
     res.status(500).json({ error: 'Internal server error' });
   },
 );

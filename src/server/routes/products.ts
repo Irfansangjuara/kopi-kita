@@ -23,7 +23,7 @@ router.get('/', async (req, res) => {
     const result = await pool.query(query, params);
     res.json(result.rows);
   } catch (error) {
-    reportServerError(error, 'Error fetching products');
+    await reportServerError(error, 'Error fetching products');
     res.status(500).json({ error: 'Failed to fetch products' });
   }
 });
@@ -58,7 +58,7 @@ router.post('/', requireAdmin, async (req, res) => {
     );
     res.status(201).json(result.rows[0]);
   } catch (error) {
-    reportServerError(error, 'Error creating product');
+    await reportServerError(error, 'Error creating product');
     res.status(500).json({ error: 'Failed to create product' });
   }
 });
@@ -100,7 +100,7 @@ router.put('/:id', requireAdmin, async (req, res) => {
     }
     res.json(result.rows[0]);
   } catch (error) {
-    reportServerError(error, 'Error updating product');
+    await reportServerError(error, 'Error updating product');
     res.status(500).json({ error: 'Failed to update product' });
   }
 });
@@ -117,7 +117,7 @@ router.delete('/:id', requireAdmin, async (req, res) => {
     }
     res.status(204).end();
   } catch (error) {
-    reportServerError(error, 'Error deleting product');
+    await reportServerError(error, 'Error deleting product');
     res.status(500).json({ error: 'Failed to delete product' });
   }
 });
