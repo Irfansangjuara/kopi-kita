@@ -28,6 +28,15 @@ router.post('/', async (req, res) => {
       return;
     }
 
+    // Online bookings only cover the seating we can assign automatically;
+    // larger groups are arranged by the staff.
+    if (size > 4) {
+      res.status(400).json({
+        error: 'Online bookings are limited to 4 guests. For larger groups, please contact us on WhatsApp.',
+      });
+      return;
+    }
+
     // Date must not be in the past (compare YYYY-MM-DD strings to avoid timezone issues)
     const today = new Date();
     const todayStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;

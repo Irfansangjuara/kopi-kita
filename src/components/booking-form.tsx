@@ -109,8 +109,8 @@ function validateBooking(details: BookingDetails, today: string): FormErrors {
     errors.partySize = 'Please enter your party size.';
   } else {
     const partySize = Number(details.partySize);
-    if (!Number.isInteger(partySize) || partySize < 1 || partySize > 8) {
-      errors.partySize = 'Party size must be between 1 and 8.';
+    if (!Number.isInteger(partySize) || partySize < 1 || partySize > 4) {
+      errors.partySize = 'Party size must be between 1 and 4. For larger groups, contact us on WhatsApp.';
     }
   }
 
@@ -373,11 +373,11 @@ export default function BookingForm() {
           </label>
           <input
             id="partySize" name="partySize" type="number" inputMode="numeric"
-            required min={1} max={8} step={1}
+            required min={1} max={4} step={1}
             value={details.partySize} onChange={handleChange} onBlur={handleBlur}
             aria-invalid={touched.partySize && Boolean(errors.partySize)}
             aria-describedby={touched.partySize && errors.partySize ? 'partySize-error' : undefined}
-            placeholder="1–8 guests"
+            placeholder="1–4 guests"
             className={`${INPUT_CLASS} ${touched.partySize && errors.partySize ? 'border-[#B42318]' : 'border-[#4A2C2A]/20'}`}
           />
           <FieldError id="partySize-error" message={touched.partySize ? errors.partySize : undefined} />
