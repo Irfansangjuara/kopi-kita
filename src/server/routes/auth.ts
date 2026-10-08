@@ -3,10 +3,13 @@ import bcrypt from 'bcryptjs';
 import { randomBytes } from 'crypto';
 import { getPool } from '../db';
 import { reportServerError } from '../observability';
+import {
+  SESSION_COOKIE_NAME,
+  SESSION_COOKIE_OPTIONS,
+  SESSION_TTL_DAYS,
+} from '../session-cookie';
 
 const router = Router();
-
-const SESSION_TTL_DAYS = 7;
 
 // POST /api/auth/login
 router.post('/login', async (req, res) => {
@@ -41,12 +44,9 @@ router.post('/login', async (req, res) => {
       [sessionId, admin.id, expiresAt],
     );
 
-    res.cookie('sessionId', sessionId, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
+    res.cookie(SESSION_COOKIE_NAME, sessionId, {
+      ...SESSION_COOKIE_OPTIONS,
       maxAge: SESSION_TTL_DAYS * 24 * 60 * 60 * 1000,
-      sameSite: 'lax',
-      path: '/',
     });
 
     res.json({ message: 'Login successful', admin: { id: admin.id, email: admin.email } });
@@ -68,7 +68,7 @@ router.post('/logout', async (req, res) => {
       await reportServerError(err, 'Session delete error');
     }
   }
-  res.clearCookie('sessionId', { path: '/' });
+  res.clearCookie(SESSION_COOKIE_NAME, SESSION_COOKIE_OPTIONS);
   res.status(204).end();
 });
 
