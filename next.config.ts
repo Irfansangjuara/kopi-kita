@@ -58,6 +58,13 @@ const nextConfig: NextConfig = {
           },
           { key: "X-Content-Type-Options", value: "nosniff" },
           { key: "X-Frame-Options", value: "DENY" },
+          // Cross-origin isolation, as far as it is safe here: COOP keeps other
+          // origins out of our browsing context, CORP stops other sites from
+          // embedding our resources. COEP require-corp is deliberately left out:
+          // the PostHog assets loaded from us-assets.i.posthog.com do not send
+          // CORP headers, so require-corp would break analytics.
+          { key: "Cross-Origin-Opener-Policy", value: "same-origin" },
+          { key: "Cross-Origin-Resource-Policy", value: "same-origin" },
           { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
           {
             key: "Permissions-Policy",
