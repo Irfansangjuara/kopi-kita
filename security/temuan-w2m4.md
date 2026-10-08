@@ -6,9 +6,9 @@ Status key: **Fixed** (merged PR), **Open** (not fixed yet — material for the 
 
 | ID | Source | OWASP 2025 | Location | Summary | Priority | Status | PR |
 | :---- | :---- | :---- | :---- | :---- | :---- | :---- | :---- |
-| F1 | Agent review | A07, A08 | `src/app/admin/login/page.tsx:88-89`, `src/server/db/seed.sql:26-28` | Demo admin credentials printed on the login page; same account seeds production | High | **Fixed** (UI) / **Open** (rotate production password — owner step, tracked below) | [#9](https://github.com/Irfansangjuara/kopi-kita/pull/9) |
-| F2 | Agent review | A07 | `src/server/routes/auth.ts` (login) | No rate limit or lockout on the single admin login: unlimited password guessing | High | **Fixed** (pending merge — needs the DB change applied first, see below) | [#10](https://github.com/Irfansangjuara/kopi-kita/pull/10) |
-| F3 | Agent review | A09 | `src/server/routes/auth.ts` (401 branches) | Failed logins were neither logged nor alerted, so brute force was invisible | Medium | **Fixed** (same PR as F2) | [#10](https://github.com/Irfansangjuara/kopi-kita/pull/10) |
+| F1 | Agent review | A07, A08 | `src/app/admin/login/page.tsx:88-89`, `src/server/db/seed.sql:26-28` | Demo admin credentials printed on the login page; same account seeds production | High | **Fixed** — UI credentials removed, and default production password changed and verified | [#9](https://github.com/Irfansangjuara/kopi-kita/pull/9) |
+| F2 | Agent review | A07 | `src/server/routes/auth.ts` (login) | No rate limit or lockout on the single admin login: unlimited password guessing | High | **Fixed** — 429 after 5 failures in 15m, persistent DB counter; merged & verified in production | [#10](https://github.com/Irfansangjuara/kopi-kita/pull/10) |
+| F3 | Agent review | A09 | `src/server/routes/auth.ts` (401 branches) | Failed logins were neither logged nor alerted, so brute force was invisible | Medium | **Fixed** — logged with key, reported to Sentry, generic 401 response; merged | [#10](https://github.com/Irfansangjuara/kopi-kita/pull/10) |
 | F4 | Agent review | A01 | `src/app/admin/{page,products/page,bookings/page,layout}.tsx` | `/admin/**` pages redirect in the client only; no server-side gate (no `middleware.ts` exists) | Medium | **Accepted** — every data endpoint re-checks with `requireAdmin`, so no data leaks; the shell renders before the redirect. Recorded in `security/threat-model.md` residual risk | — |
 | F5 | Agent review | A10 | `src/server/routes/auth.ts:65-69` | Logout swallows a failed session delete and still returns 204, so a session can outlive "logout" | Medium | **Open** (the failure is now reported to Sentry by `reportServerError`, so it is visible; the flow itself is unchanged) | — |
 | F6 | Agent review | A02 | `src/server/routes/auth.ts:44-50` | Session cookie flags defined inline, `secure` driven by `NODE_ENV`, and not mirrored on `clearCookie` | Medium | **Fixed** — one definition in `src/server/session-cookie.ts`, used by login, logout and `requireAdmin` | [#3](https://github.com/Irfansangjuara/kopi-kita/pull/3) |
@@ -25,10 +25,13 @@ Status key: **Fixed** (merged PR), **Open** (not fixed yet — material for the 
 | M2-1 | Sentry (Module 2) | A10 | `src/app/api/[...slug]/route.ts` | Malformed JSON on `POST /api/bookings` answers 500 and then kills the function (`removeListener`) — Sentry issue **KOPI-KITA-4** | Medium | **Open** | — |
 | F16 | Own curl proof | A10 | `src/app/api/[...slug]/route.ts` | A GET that carries a JSON body answers 500 (`GET /api/bookings` with `-d '{}'`), while the same request without a body answers 401 — the bridge mishandles bodies on GET/HEAD | Low | **Open** | — |
 
-## Sizing note on F2/F3 (why the PR is not merged yet)
+## Verification of F1, F2, F3 on production (PR #10 merged)
 
-`fix/sec-ratelimit` (#10) queries the new `login_attempts` table on every login. The table is created by `src/server/db/changes/001-login-attempts.sql`; this project has no migration tool, so the file is run by hand. **Order matters: run the SQL against production first, then merge.** Until then, logins would fail with "relation login_attempts does not exist". The change is already applied to the local dev database and verified there.
-
+PR [#10](https://github.com/Irfansangjuara/kopi-kita/pull/10) is merged into `main` and live in production.
+- `login_attempts` table is created and indexed in the production database.
+- Password guessing generates HTTP 429 `{"error":"Too many attempts, try again later"}` once failures reach 5.
+- The default admin password `kopikita-admin` is disabled (answers 401).
+- The new production admin password is active, returns 200, sets `sessionId` cookie with `HttpOnly; Secure; SameSite=Lax`, and resets failed attempts.
 ## Verified-good (so the reviewer can see what was checked and found clean)
 
 - **Every admin endpoint answers 401 without a session cookie**: `GET /api/bookings`, `PATCH /api/bookings/:id`, `POST|PUT|DELETE /api/products/:id` (curl proof in the rate-limit and headers PRs; the Express `requireAdmin` middleware fails closed on database errors).
@@ -37,8 +40,8 @@ Status key: **Fixed** (merged PR), **Open** (not fixed yet — material for the 
 - **No stack traces or database details reach the browser**: the global handler returns `{ "error": "Internal server error" }`.
 - **No secrets in git history**: `gitleaks git -v` → 31 commits, no leaks.
 
-## Owner steps still open
+## Owner steps completed
 
-1. Rotate the production admin password (`UPDATE admins SET password_hash = … WHERE email = 'admin@kopikita.id'; DELETE FROM sessions;`) — F1 part 2.
-2. Apply `src/server/db/changes/001-login-attempts.sql` to production, then merge #10 — F2/F3.
-3. Optionally delete the dormant `api/**` backend — F14.
+1. ✅ Production admin password rotated, old default disabled (F1).
+2. ✅ Database migration applied to production, PR #10 merged and live (F2, F3).
+3. ⏳ Optionally delete the dormant `api/**` backend — F14.

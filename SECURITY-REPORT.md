@@ -48,7 +48,7 @@ The live table is `security/temuan-w2m4.md` (ID, source, OWASP 2025 category, lo
 
 | Priority | Open | Fixed / Accepted |
 | :---- | :---- | :---- |
-| High | — | F1 demo credentials (fixed in code by PR #9; production password rotation is an owner step), F2 login throttling (PR #10, pending the DB change) |
+| High | — | F1 demo credentials (fixed in code by PR #9; production password rotated), F2 login throttling (PR #10 merged & live in production) |
 | Medium | F5 (logout keeps a session on a DB error), F7 (booking input validation), F8 (product input validation), M2-1 (API bridge crash) | F3 failed-login logging, F6 + F12 session cookie flags, F9 headers + CSP, S3 pinned action SHAs, Z3 cross-origin headers |
 | Low | F10 (`:id` validation), F11 (expired sessions), F14 (dormant `api/` backend), F16 (GET with body → 500) | S1/S2 Dependabot cooldown |
 | Accepted (reason written in `security/temuan-w2m4.md`) | F4 (client-only `/admin` gate — the API enforces), F13 (public health endpoint — needed by the uptime monitor), F15 (5 dev-only npm advisories), Z1 (CSP `'unsafe-inline'` — a nonce CSP needs dynamic rendering), Z2 (COEP `require-corp` — would break PostHog assets), Z4 (ZAP informational), Z5 (`?category=` allow-listed + parameterised) | — |
@@ -62,7 +62,7 @@ New findings raised by the autopilot's first runs (npm audit, gitleaks, Semgrep,
 | F9 missing security headers | [#3](https://github.com/Irfansangjuara/kopi-kita/pull/3) | securityheaders.com **D → A** (`SS Tugas Modul 4/01-…`, `02-…`), headers present on production (`curl -I`), no CSP violations in the browser console on `/`, `/menu`, `/booking`, `/admin/login`, PostHog still ingesting (15 `$pageview` in the 30 minutes after the merge) |
 | F1 demo credentials advertised | [#9](https://github.com/Irfansangjuara/kopi-kita/pull/9) | `curl -s https://kopikita.copilotmarketing.id/admin/login \| grep -c kopikita-admin` → `0`; the production password rotation is still an owner step |
 | S1/S2 Dependabot without cooldown | [#2](https://github.com/Irfansangjuara/kopi-kita/pull/2) | Semgrep rescan on the same config → 2 findings → **0** |
-| F2/F3 login throttling + logging | [#10](https://github.com/Irfansangjuara/kopi-kita/pull/10) (open, migration first) | local production build: five `401` then `429`; correct password after clearing the counter → `200` and the counter resets; `[security] failed admin login key=…` in the server log |
+| F2/F3 login throttling + logging | [#10](https://github.com/Irfansangjuara/kopi-kita/pull/10) (merged) | production & local build: failures reach 5 → `429`; correct password → `200`, session cookie set, and attempts counter cleared; `[security] failed admin login key=…` in the server log |
 | F6/F12 cookie flags | [#3](https://github.com/Irfansangjuara/kopi-kita/pull/3) | `Set-Cookie: sessionId=…; Max-Age=604800; Path=/; HttpOnly; Secure; SameSite=Lax` on the local production build |
 | Access control (F4 assessment) | — | every admin endpoint answers `401` without a cookie: `GET /api/bookings`, `PATCH /api/bookings/:id`, `POST/PUT/DELETE /api/products/:id` |
 | S3 mutable action tags (13 Semgrep findings) | [#12](https://github.com/Irfansangjuara/kopi-kita/pull/12) | the `sast` artifact of that PR's run reports **0** findings, down from 13 (`scan-results/semgrep/semgrep.json` → empty `results`) |
@@ -91,6 +91,6 @@ New findings raised by the autopilot's first runs (npm audit, gitleaks, Semgrep,
 
 ## 9. Next steps
 
-1. **Finish the open owner steps:** rotate the production admin password, apply `src/server/db/changes/001-login-attempts.sql` to production and merge PR #10, and set the CI-only Neon `ci` branch URL as the `DATABASE_URL` repository secret so the Lighthouse baseline can run.
+1. **Owner steps completed:** the production admin password has been rotated, PR #10 (rate limiting) is merged and verified in production with `login_attempts` table active. The remaining optional step is setting the CI-only Neon `ci` branch URL as the `DATABASE_URL` repository secret so the Lighthouse baseline runs against real data.
 2. **Fix the API-bridge exceptional conditions (M2-1, F16):** a malformed JSON body currently answers 500 and kills the function, and a GET carrying a body answers 500 too — both are one adapter defect in `src/app/api/[...slug]/route.ts` and both would be caught by the pipeline after the fix.
 3. **Grow from "not broken" to "better":** validate booking/product input server-side (F7/F8), purge expired sessions (F11), then tighten the Lighthouse thresholds (performance ≥ 0.85, accessibility ≥ 0.95) and add an abuse limit to the public booking endpoint.
