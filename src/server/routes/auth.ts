@@ -11,6 +11,13 @@ import {
 
 const router = Router();
 
+// Password guessing on the single admin account is throttled per (email, IP):
+// after RATE_LIMIT_MAX_FAILURES failures inside the window, logins are refused
+// until the window slides past. Counters live in Postgres, not in memory,
+// because serverless instances do not share memory.
+const RATE_LIMIT_WINDOW_MINUTES = 15;
+const RATE_LIMIT_MAX_FAILURES = 5;
+
 // POST /api/auth/login
 router.post('/login', async (req, res) => {
   try {
@@ -22,8 +29,33 @@ router.post('/login', async (req, res) => {
       return;
     }
 
+    const forwarded = req.headers['x-forwarded-for'];
+    const ip =
+      typeof forwarded === 'string' && forwarded.length > 0
+        ? forwarded.split(',')[0].trim()
+        : req.ip ?? 'unknown';
+    const attemptKey = `${email.toLowerCase()}:${ip}`;
+    const windowStart = new Date(Date.now() - RATE_LIMIT_WINDOW_MINUTES * 60 * 1000);
+
+    const recentFailures = await pool.query<{ failures: number }>(
+      'SELECT COUNT(*)::int AS failures FROM login_attempts WHERE key = $1 AND created_at > $2',
+      [attemptKey, windowStart],
+    );
+
+    if (recentFailures.rows[0].failures >= RATE_LIMIT_MAX_FAILURES) {
+      await reportServerError(
+        new Error(`Login throttled after ${recentFailures.rows[0].failures} failed attempts`),
+        'Login rate limit hit',
+      );
+      res.status(429).json({ error: 'Too many attempts, try again later' });
+      return;
+    }
+
     const result = await pool.query('SELECT * FROM admins WHERE email = $1', [email]);
     if (result.rows.length === 0) {
+      // Same generic answer as a wrong password: no user enumeration.
+      await pool.query('INSERT INTO login_attempts (key) VALUES ($1)', [attemptKey]);
+      console.warn(`[security] failed admin login key=${attemptKey}`);
       res.status(401).json({ error: 'Invalid credentials' });
       return;
     }
@@ -31,9 +63,14 @@ router.post('/login', async (req, res) => {
     const admin = result.rows[0] as { id: number; email: string; password_hash: string };
     const passwordMatch = await bcrypt.compare(password, admin.password_hash);
     if (!passwordMatch) {
+      await pool.query('INSERT INTO login_attempts (key) VALUES ($1)', [attemptKey]);
+      console.warn(`[security] failed admin login key=${attemptKey}`);
       res.status(401).json({ error: 'Invalid credentials' });
       return;
     }
+
+    // A successful login clears the failure counter for this email + IP
+    await pool.query('DELETE FROM login_attempts WHERE key = $1', [attemptKey]);
 
     // Store session in DB
     const sessionId = randomBytes(32).toString('hex');
