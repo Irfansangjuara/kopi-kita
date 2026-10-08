@@ -28,6 +28,19 @@ router.post('/', async (req, res) => {
       return;
     }
 
+    // Seat online bookings from the seating chart the shop uses
+    const SEATING_CHART: Record<number, { label: string; capacity: number }> = {
+      1: { label: 'bar', capacity: 1 },
+      2: { label: 'meja-kecil', capacity: 2 },
+      3: { label: 'meja-sedang', capacity: 4 },
+      4: { label: 'meja-panjang', capacity: 4 },
+    };
+    const seating = SEATING_CHART[size];
+    if (seating.capacity < size) {
+      res.status(400).json({ error: `Seating for ${size} guests is not available online` });
+      return;
+    }
+
     // Date must not be in the past (compare YYYY-MM-DD strings to avoid timezone issues)
     const today = new Date();
     const todayStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
