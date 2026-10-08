@@ -3,6 +3,8 @@ import { reportServerError } from './observability';
 
 const { Pool } = pg;
 
+export type DbPool = InstanceType<typeof Pool>;
+
 // Fix for DATE type: return as 'YYYY-MM-DD' string instead of JavaScript Date object.
 // Without this, node-postgres shifts DATE values to UTC midnight which causes off-by-one
 // day errors in WIB (UTC+7).

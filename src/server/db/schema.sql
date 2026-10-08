@@ -40,7 +40,15 @@ CREATE TABLE IF NOT EXISTS sessions (
   created_at  TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
+-- Failed admin logins, used to throttle password guessing
+CREATE TABLE IF NOT EXISTS login_attempts (
+  id         SERIAL PRIMARY KEY,
+  key        TEXT NOT NULL,               -- email + request IP
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
 -- Indexes for common queries
+CREATE INDEX IF NOT EXISTS idx_login_attempts_key  ON login_attempts(key, created_at);
 CREATE INDEX IF NOT EXISTS idx_products_category   ON products(category);
 CREATE INDEX IF NOT EXISTS idx_products_available  ON products(available);
 CREATE INDEX IF NOT EXISTS idx_bookings_date       ON bookings(booking_date);
