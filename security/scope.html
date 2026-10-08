@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Kopi Kita — Security Testing Scope Statement</title>
+<style>
+  @page { size: A4; margin: 13mm 14mm; }
+  html { font-size: 9.6pt; }
+  body { font-family: -apple-system, "Helvetica Neue", Arial, sans-serif; color: #111; line-height: 1.3; }
+  h1 { font-size: 14pt; margin: 0 0 1.5mm; }
+  h2 { font-size: 10.5pt; margin: 3.4mm 0 1mm; border-bottom: 1px solid #ddd; padding-bottom: 0.6mm; }
+  p.meta { margin: 0 0 2.5mm; color: #333; }
+  ul { margin: 1mm 0 1mm 4.5mm; padding: 0; }
+  li { margin-bottom: 0.6mm; }
+  .sig { margin-top: 6mm; display: flex; gap: 18mm; }
+  .sig div { flex: 1; border-top: 1px solid #111; padding-top: 1.2mm; font-size: 9pt; color: #444; }
+  .note { margin-top: 4mm; font-size: 8.6pt; color: #555; }
+</style>
+</head>
+<body>
+<h1>Security Testing Scope Statement — Kopi Kita</h1>
+<p class="meta"><strong>Signed by:</strong> Irfan Sangjuara &nbsp;·&nbsp; <strong>Date:</strong> 2026-10-08<br>
+<strong>Project:</strong> Kopi Kita — coffee shop web app (Next.js app router, Express API, Postgres)<br>
+<strong>Repository:</strong> https://github.com/Irfansangjuara/kopi-kita</p>
+
+<h2>1. Assets I MAY test</h2>
+<ul>
+  <li>The GitHub repository I own (source review, dependency scans, secret scans, CI workflows).</li>
+  <li>The application built and started locally on my own laptop, at <code>http://localhost:3000</code> (and <code>http://localhost:4000</code> if the API runs standalone).</li>
+  <li>The CI pipeline inside that repository, including the containerised Postgres service used by CI jobs.</li>
+  <li>A database branch explicitly created for testing (local Docker Postgres, or a Neon dev/ci branch), never the production branch.</li>
+  <li>My own Vercel preview deployments, only for single manual requests with <code>vercel curl</code> (no scanning).</li>
+</ul>
+
+<h2>2. Assets I may NOT test</h2>
+<ul>
+  <li>The production <code>*.vercel.app</code> URL and <code>https://kopikita.copilotmarketing.id</code> with any active scan, fuzzing, or load test. Vercel permits penetration testing on Pro and Enterprise only; Kopi Kita runs on Hobby.</li>
+  <li>The Neon <strong>production</strong> database (no load testing, no destructive queries, no schema experiments).</li>
+  <li>Any application, domain, or repository that does not belong to me — classmates' apps, the Universa app, and any other third-party system, "just for fun" included.</li>
+  <li>Anything behind someone else's account, even if I can reach it.</li>
+</ul>
+
+<h2>3. Forbidden activities</h2>
+<ul>
+  <li>Brute force, credential stuffing, denial of service, stress or load testing against production.</li>
+  <li>Active scanning (DAST, fuzzing, automated vulnerability scanners) against any production URL or third-party infrastructure. Dynamic scans run only against a local build in CI (<code>http://localhost:3000</code>).</li>
+  <li>Using real customer data (names, WhatsApp numbers, booking notes) in tests, screenshots, or reports. Dummy data only.</li>
+  <li>Rewriting git history or rotating production secrets without the owner's approval.</li>
+  <li>Sharing, publishing, or committing any secret, token, or personal data found during testing.</li>
+</ul>
+
+<h2>4. Legal basis</h2>
+<ul>
+  <li><strong>Criminal Code (KUHP), Law 1/2023, Article 332</strong> — in force since 2 January 2026, replacing Articles 30 and 46 of the ITE Law: accessing another party's electronic system without authorisation is punishable by up to 6 years, up to 7 years where the purpose is to obtain data, and up to 8 years where a security system is broken. Testing my own system, within the limits above, stays inside "with authorisation".</li>
+  <li><strong>Personal Data Protection Law (UU PDP), Law 27/2022</strong> — in full force since 17 October 2024. Names and phone numbers in the <code>bookings</code> table are personal data; as data controller I am responsible for keeping them out of tests, logs, analytics, and reports.</li>
+</ul>
+
+<p class="note">I have read this statement, I understand the limits, and I will follow them.</p>
+
+<div class="sig">
+  <div>Signature</div>
+  <div>Date</div>
+</div>
+</body>
+</html>
