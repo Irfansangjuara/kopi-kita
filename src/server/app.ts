@@ -21,11 +21,6 @@ app.use('/api/products', productsRouter);
 app.use('/api/bookings', bookingsRouter);
 app.use('/api/auth', authRouter);
 
-// Health check
-app.get('/api/health', (_req, res) => {
-  res.json({ status: 'ok' });
-});
-
 // 404 fallback
 app.use((_req, res) => {
   res.status(404).json({ error: 'Route not found' });
