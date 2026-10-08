@@ -1,7 +1,8 @@
 import { Router } from 'express';
 import bcrypt from 'bcryptjs';
 import { randomBytes } from 'crypto';
-import { getPool } from '../db';
+import { getPool, type DbPool } from '../db';
+import { requireAdmin } from '../middleware/auth';
 import { reportServerError } from '../observability';
 import {
   SESSION_COOKIE_NAME,
@@ -17,6 +18,23 @@ const router = Router();
 // because serverless instances do not share memory.
 const RATE_LIMIT_WINDOW_MINUTES = 15;
 const RATE_LIMIT_MAX_FAILURES = 5;
+let loginAttemptsTableEnsured = false;
+async function ensureLoginAttemptsTable(pool: DbPool) {
+  if (loginAttemptsTableEnsured) return;
+  try {
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS login_attempts (
+        id SERIAL PRIMARY KEY,
+        key TEXT NOT NULL,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      );
+      CREATE INDEX IF NOT EXISTS idx_login_attempts_key ON login_attempts(key, created_at);
+    `);
+    loginAttemptsTableEnsured = true;
+  } catch (err) {
+    console.error('Error ensuring login_attempts table:', err);
+  }
+}
 
 // POST /api/auth/login
 router.post('/login', async (req, res) => {
@@ -36,6 +54,7 @@ router.post('/login', async (req, res) => {
         : req.ip ?? 'unknown';
     const attemptKey = `${email.toLowerCase()}:${ip}`;
     const windowStart = new Date(Date.now() - RATE_LIMIT_WINDOW_MINUTES * 60 * 1000);
+    await ensureLoginAttemptsTable(pool);
 
     const recentFailures = await pool.query<{ failures: number }>(
       'SELECT COUNT(*)::int AS failures FROM login_attempts WHERE key = $1 AND created_at > $2',
@@ -136,6 +155,51 @@ router.get('/me', async (req, res) => {
   } catch (err) {
     await reportServerError(err, 'Auth/me error');
     res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// POST /api/auth/change-password
+router.post('/change-password', requireAdmin, async (req, res) => {
+  try {
+    const pool = getPool();
+    const { currentPassword, newPassword } = req.body as {
+      currentPassword?: string;
+      newPassword?: string;
+    };
+
+    if (!currentPassword || !newPassword) {
+      res.status(400).json({ error: 'Current password and new password are required' });
+      return;
+    }
+
+    if (newPassword.length < 8) {
+      res.status(400).json({ error: 'New password must be at least 8 characters' });
+      return;
+    }
+
+    const adminId = req.adminSession?.adminId;
+    const result = await pool.query('SELECT * FROM admins WHERE id = $1', [adminId]);
+    if (result.rows.length === 0) {
+      res.status(404).json({ error: 'Admin not found' });
+      return;
+    }
+
+    const admin = result.rows[0] as { id: number; email: string; password_hash: string };
+    const passwordMatch = await bcrypt.compare(currentPassword, admin.password_hash);
+    if (!passwordMatch) {
+      res.status(401).json({ error: 'Current password incorrect' });
+      return;
+    }
+
+    const newHash = await bcrypt.hash(newPassword, 10);
+    await pool.query('UPDATE admins SET password_hash = $1 WHERE id = $2', [newHash, adminId]);
+    await pool.query('DELETE FROM sessions WHERE admin_id = $1', [adminId]);
+
+    console.log(`[security] Admin password updated for ${admin.email}`);
+    res.json({ message: 'Password updated successfully' });
+  } catch (err) {
+    await reportServerError(err, 'Password update error');
+    res.status(500).json({ error: 'Failed to update password' });
   }
 });
 
