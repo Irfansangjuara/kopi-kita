@@ -28,16 +28,12 @@ router.post('/', async (req, res) => {
       return;
     }
 
-    // Seat online bookings from the seating chart the shop uses
-    const SEATING_CHART: Record<number, { label: string; capacity: number }> = {
-      1: { label: 'bar', capacity: 1 },
-      2: { label: 'meja-kecil', capacity: 2 },
-      3: { label: 'meja-sedang', capacity: 4 },
-      4: { label: 'meja-panjang', capacity: 4 },
-    };
-    const seating = SEATING_CHART[size];
-    if (seating.capacity < size) {
-      res.status(400).json({ error: `Seating for ${size} guests is not available online` });
+    // Online bookings only cover the seating we can assign automatically;
+    // larger groups are arranged by the staff.
+    if (size > 4) {
+      res.status(400).json({
+        error: 'Online bookings are limited to 4 guests. For larger groups, please contact us on WhatsApp.',
+      });
       return;
     }
 
